@@ -59,27 +59,9 @@ function PageSkeleton() {
 }
 
 // 前台布局 - 包含 CustomScrollbar + Header + Navigation
-function FrontendLayout({ loaded, progress }: { loaded: boolean; progress: number }) {
+function FrontendLayout() {
   return (
     <CustomScrollbar className="h-full w-full bg-[#0a0a0a]">
-      {!loaded && (
-        <div className="fixed inset-0 z-[9999] bg-[#0a0a0a] flex items-center justify-center">
-          <div className="text-center">
-            <div
-              className="text-[#e60012] font-bold tracking-tighter"
-              style={{ fontFamily: MONO, fontSize: '3rem' }}
-            >
-              {progress}%
-            </div>
-            <div
-              className="mt-4 text-[#888888] text-xs tracking-widest uppercase"
-              style={{ fontFamily: MONO }}
-            >
-              INITIALIZING SECURE CONNECTION
-            </div>
-          </div>
-        </div>
-      )}
       <Header />
       <Navigation />
       <main>
@@ -125,7 +107,7 @@ export default function App() {
         <Route path="/admin/announcements/:id" element={<Suspense fallback={<PageSkeleton />}><CMSAnnouncementForm /></Suspense>} />
 
         {/* 前台页面 - 使用 FrontendLayout */}
-        <Route element={<FrontendLayout loaded={loaded} progress={loadingProgress} />}>
+        <Route element={<FrontendLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/archives" element={<Archives />} />
           <Route path="/archives/:category" element={<Archives />} />
