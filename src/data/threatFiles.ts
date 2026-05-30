@@ -5,7 +5,7 @@ export const THREAT_FILES: ThreatFile[] = [
     id: 'TMS-O0881',
     code: 'TMS-O0881',
     title: '万花筒殿 (Kaleidoscope Palace)',
-    status: '活跃',
+    status: '在档',
     threatLevel: '琥珀色-C',
     threatLevelColor: '琥珀色',
     archiveDate: '[数据删除]',
@@ -24,7 +24,7 @@ export const THREAT_FILES: ThreatFile[] = [
     relatedArchives: [
       {
         code: 'EXP-O0881',
-        type: '勘探实验记录',
+        type: '勘探记录',
         title: '织梦者队对万花筒殿首次勘探日志',
         relation: '核心案例数据',
       },
@@ -263,7 +263,7 @@ export const THREAT_FILES: ThreatFile[] = [
     id: 'TMS-L0234',
     code: 'TMS-L0234',
     title: '明知山 (The Mountain of Knowing)',
-    status: '活跃',
+    status: '在档',
     threatLevel: '琥珀色-C',
     threatLevelColor: '琥珀色',
     archiveDate: '[数据删除]',
@@ -281,7 +281,7 @@ export const THREAT_FILES: ThreatFile[] = [
     relatedArchives: [
       {
         code: 'EXP-L0234',
-        type: '勘探实验记录',
+        type: '勘探记录',
         title: '勘探队"伽马"首次勘探记录',
         relation: '记录了明知山的发现和初步评估',
       },
@@ -441,7 +441,7 @@ export const THREAT_FILES: ThreatFile[] = [
     id: 'TMS-L0734',
     code: 'TMS-L0734',
     title: '囤积者回廊 (The Hoarder\'s Corridor)',
-    status: '活跃',
+    status: '在档',
     threatLevel: '黄色-CP',
     threatLevelColor: '黄色',
     archiveDate: '[数据删除]',
@@ -458,7 +458,7 @@ export const THREAT_FILES: ThreatFile[] = [
     relatedArchives: [
       {
         code: 'EXP-L0734',
-        type: '勘探实验记录',
+        type: '勘探记录',
         title: '勘探队"伽马"对TMS-L0734探索日志',
         relation: '发现记录',
       },
@@ -604,7 +604,7 @@ export const THREAT_FILES: ThreatFile[] = [
     id: 'TMS-E0771',
     code: 'TMS-E0771',
     title: '生物侵蚀模因载体 (Bio-Erosive Memetic Carrier)',
-    status: '活跃',
+    status: '在档',
     threatLevel: '琥珀色-EC',
     threatLevelColor: '琥珀色',
     archiveDate: '[数据删除]',
@@ -622,7 +622,7 @@ export const THREAT_FILES: ThreatFile[] = [
     relatedArchives: [
       {
         code: 'EXP-E0771',
-        type: '勘探实验记录',
+        type: '勘探记录',
         title: '勘探队"守护者"探索日志',
         relation: '首次发现记录',
       },
@@ -994,7 +994,7 @@ export const THREAT_FILES: ThreatFile[] = [
     id: 'TMS-L0735',
     code: 'TMS-L0735',
     title: '深邃之海 (The Deep Oceanic Simulacrum)',
-    status: '活跃',
+    status: '在档',
     threatLevel: '琥珀色-PC',
     threatLevelColor: '琥珀色',
     archiveDate: '[数据删除]',
@@ -1012,7 +1012,7 @@ export const THREAT_FILES: ThreatFile[] = [
     relatedArchives: [
       {
         code: 'EXP-L0735',
-        type: '勘探实验记录',
+        type: '勘探记录',
         title: '勘探队"伽马"任务报告',
         relation: '首次发现与初步勘探记录',
       },
@@ -1161,7 +1161,7 @@ export const THREAT_FILES: ThreatFile[] = [
     id: 'TMS-O0442-01',
     code: 'TMS-O0442-01',
     title: '共鸣水晶 (Resonance Crystal)',
-    status: '活跃',
+    status: '在档',
     threatLevel: '黄色-CP',
     threatLevelColor: '黄色',
     archiveDate: '[数据删除]',
@@ -1178,7 +1178,7 @@ export const THREAT_FILES: ThreatFile[] = [
     relatedArchives: [
       {
         code: 'EXP-O0442',
-        type: '勘探实验记录',
+        type: '勘探记录',
         title: '勘探队"Beta"回音殿堂探索记录',
         relation: '发现记录',
       },
@@ -1537,7 +1537,7 @@ export const THREAT_FILES: ThreatFile[] = [
     id: 'TMS-T0112',
     code: 'TMS-T0112',
     title: '静默车站 (The Silent Station)',
-    status: '活跃',
+    status: '在档',
     threatLevel: '黄色-T',
     threatLevelColor: '黄色',
     archiveDate: '2024-08-01',
@@ -1555,7 +1555,7 @@ export const THREAT_FILES: ThreatFile[] = [
     relatedArchives: [
       {
         code: 'EXP-T0112',
-        type: '勘探实验记录',
+        type: '勘探记录',
         title: '快速反应小队"守夜人"首次调查记录',
         relation: '记录了静默车站的发现和初步评估',
       },

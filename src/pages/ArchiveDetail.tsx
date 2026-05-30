@@ -47,7 +47,7 @@ function getCategoryColor(category: string): string {
   const colors: Record<string, string> = {
     '阈界档案': '#e60012',
     '勘探记录': '#d4a373',
-    '勘探实验记录': '#d4a373',
+    '勘探记录': '#d4a373',
     '事件报告': '#ff6b6b',
     '事件通信': '#ff6b6b',
     '人事档案': '#4ade80',
@@ -282,28 +282,28 @@ export default function ArchiveDetail() {
           <div className="lg:col-span-2 space-y-6">
             {/* Description */}
             {archive.category !== '人事档案' && (
-            <Section title="档案说明" code="DESC">
-              <div className="space-y-3">
-                {archive.mainDangers.length > 0 && (
-                  <div>
-                    <div className="text-xs text-[#e60012] mb-2">主要危险</div>
-                    <div className="flex flex-wrap gap-2">
-                      {archive.mainDangers.map((danger, i) => (
-                        <span
-                          key={i}
-                          className="text-xs text-[#e60012] border border-[#e60012]/30 px-2 py-0.5"
-                        >
-                          {danger}
-                        </span>
-                      ))}
+              <Section title="档案说明" code="DESC">
+                <div className="space-y-3">
+                  {archive.mainDangers.length > 0 && (
+                    <div>
+                      <div className="text-xs text-[#e60012] mb-2">主要危险</div>
+                      <div className="flex flex-wrap gap-2">
+                        {archive.mainDangers.map((danger, i) => (
+                          <span
+                            key={i}
+                            className="text-xs text-[#e60012] border border-[#e60012]/30 px-2 py-0.5"
+                          >
+                            {danger}
+                          </span>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
-                <p className="text-sm text-[#888888] leading-relaxed">
-                  {archive.description || '暂无描述'}
-                </p>
-              </div>
-            </Section>
+                  )}
+                  <p className="text-sm text-[#888888] leading-relaxed">
+                    {archive.description || '暂无描述'}
+                  </p>
+                </div>
+              </Section>
             )}
 
             {/* Typed details rendering */}
@@ -456,14 +456,14 @@ export default function ArchiveDetail() {
                         className={`absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full transition-all duration-200 opacity-0 group-hover:opacity-100 hover:scale-110 ${activeMedia === 0 ? 'hidden' : 'bg-black/60 hover:bg-black/80 text-[#d4a373]'}`}
                         aria-label="上一张"
                       >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6"/></svg>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6" /></svg>
                       </button>
                       <button
                         onClick={() => setActiveMedia(1)}
                         className={`absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full transition-all duration-200 opacity-0 group-hover:opacity-100 hover:scale-110 ${activeMedia === 1 ? 'hidden' : 'bg-black/60 hover:bg-black/80 text-[#d4a373]'}`}
                         aria-label="下一张"
                       >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6"/></svg>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6" /></svg>
                       </button>
                     </>
                   )}
@@ -680,7 +680,7 @@ function TypedDetailsContent({ category, details }: { category: string; details:
   switch (category) {
     case '阈界档案':
       return <ThreatFileContent details={details} />
-    case '勘探实验记录':
+    case '勘探记录':
     case '勘探记录':
       return <ExplorationLogContent details={details} />
     case '事件报告':
@@ -966,7 +966,7 @@ function ThreatFileContent({ details }: { details: Record<string, unknown> }) {
   )
 }
 
-// 勘探实验记录内容渲染
+// 勘探记录内容渲染
 function ExplorationLogContent({ details }: { details: Record<string, unknown> }) {
   const hasBasicInfo = details.missionCode || details.targetThreshold || details.team || details.teamLeader || details.explorationDate || details.missionStatus
 

@@ -5,7 +5,7 @@ export const INCIDENT_REPORTS: IncidentReport[] = [
     id: 'EVT-P0990-INC',
     code: 'EVT-P0990-INC',
     title: '第73区大规模慢性失眠集群事件报告',
-    status: '活跃',
+    status: '在档',
     threatLevel: '琥珀色-C',
     threatLevelColor: '琥珀色',
     archiveDate: '[数据删除]',
@@ -20,7 +20,7 @@ export const INCIDENT_REPORTS: IncidentReport[] = [
     relatedArchives: [
       {
         code: 'EXP-P0990',
-        type: '勘探实验记录',
+        type: '勘探记录',
         title: '"夜莺"无人机勘探数据摘要',
         relation: '关联勘探数据',
       },

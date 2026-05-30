@@ -10,7 +10,7 @@ export default function Operations() {
 
   useEffect(() => {
     setLoading(true)
-    api.archives.list({ category: '勘探实验记录', limit: '10', page: '1' })
+    api.archives.list({ category: '勘探记录', limit: '10', page: '1' })
       .then((res) => setExplorations(res.data))
       .catch((err) => setError(err.message || '加载失败'))
       .finally(() => setLoading(false))
@@ -62,11 +62,10 @@ export default function Operations() {
                   <div key={exp.id} className="border border-white/5 p-4">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-[10px] text-[#d4a373]" style={{ fontFamily: MONO }}>{exp.code}</span>
-                      <span className={`text-[10px] px-2 py-0.5 border ${
-                        exp.status === '活跃' ? 'text-[#4ade80] border-[#4ade80]/40' :
-                        exp.status === '封存' ? 'text-[#888888] border-white/10' :
-                        'text-[#facc15] border-[#facc15]/40'
-                      }`}>
+                      <span className={`text-[10px] px-2 py-0.5 border ${exp.status === '活跃' ? 'text-[#4ade80] border-[#4ade80]/40' :
+                          exp.status === '封存' ? 'text-[#888888] border-white/10' :
+                            'text-[#facc15] border-[#facc15]/40'
+                        }`}>
                         {exp.status}
                       </span>
                     </div>

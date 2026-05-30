@@ -54,12 +54,12 @@ export default function CMSArchiveForm() {
     ]).then(([depts, pers]) => {
       setDepartments(Array.isArray(depts) ? depts : [])
       setPersonnel(Array.isArray(pers) ? pers : [])
-    }).catch(() => {})
+    }).catch(() => { })
 
     fetch(`${API_BASE}/cms/templates`)
       .then(r => r.json())
       .then(data => setTemplates(Array.isArray(data) ? data : []))
-      .catch(() => {})
+      .catch(() => { })
   }, [])
 
   useEffect(() => {
@@ -183,7 +183,7 @@ export default function CMSArchiveForm() {
                 <label className="text-xs text-[#888888] block mb-1">类别</label>
                 <select value={form.category} onChange={e => handleChange('category', e.target.value)} className="w-full bg-white/5 border border-white/10 rounded px-3 py-2 text-xs focus:border-[#d4a373] focus:outline-none">
                   <option value="阈界档案">阈界档案</option>
-                  <option value="勘探实验记录">勘探记录</option>
+                  <option value="勘探记录">勘探记录</option>
                   <option value="事件报告">事件报告</option>
                   <option value="实验记录">实验记录</option>
                   <option value="医疗报告">医疗报告</option>
@@ -211,7 +211,7 @@ export default function CMSArchiveForm() {
               <div>
                 <label className="text-xs text-[#888888] block mb-1">状态</label>
                 <select value={form.status} onChange={e => handleChange('status', e.target.value)} className="w-full bg-white/5 border border-white/10 rounded px-3 py-2 text-xs focus:border-[#d4a373] focus:outline-none">
-                  <option value="活跃">活跃</option>
+                  <option value="在档">在档</option>
                   <option value="封存">封存</option>
                   <option value="销毁待定">销毁待定</option>
                   <option value="已销毁">已销毁</option>
@@ -276,7 +276,7 @@ export default function CMSArchiveForm() {
                       }))}
                       className="absolute top-2 right-2 text-[#e60012] hover:text-[#c40010]"
                     >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12" /></svg>
                     </button>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
@@ -342,7 +342,7 @@ export default function CMSArchiveForm() {
                 }))}
                 className="text-[#d4a373] hover:text-[#c49463] text-xs flex items-center gap-1"
               >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 5v14M5 12h14"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 5v14M5 12h14" /></svg>
                 添加签名
               </button>
             </div>
@@ -393,8 +393,29 @@ export default function CMSArchiveForm() {
           </div>
 
           <div className="border border-white/10 rounded p-4 space-y-4">
-            <h2 className="text-sm text-[#d4a373]">附件文本</h2>
-            <p className="text-xs text-[#666]">点击"读取源文件"按钮时展示的内容，支持 Markdown</p>
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm text-[#d4a373]">附件文本</h2>
+              <label className="flex items-center gap-1.5 text-xs text-[#d4a373] cursor-pointer hover:text-[#c49463] transition-colors">
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="17 8 12 3 7 8" />
+                  <line x1="12" y1="3" x2="12" y2="15" />
+                </svg>
+                上传文件
+                <input type="file" accept=".txt,.md,.json,.csv,.html,.xml,.yaml,.yml,.log" className="hidden" onChange={async (e) => {
+                  const file = e.target.files?.[0]
+                  if (!file) return
+                  try {
+                    const text = await file.text()
+                    handleChange('attachmentText', text)
+                  } catch (err) {
+                    console.error('文件读取失败', err)
+                  }
+                  e.target.value = ''
+                }} />
+              </label>
+            </div>
+            <p className="text-xs text-[#666]">点击"读取源文件"按钮时展示的内容，支持 Markdown。支持上传 .txt / .md / .json 等文本文件</p>
             <div className="border border-white/10 rounded overflow-hidden" data-color-mode="dark">
               <MDEditor value={form.attachmentText} onChange={(val) => handleChange('attachmentText', val || '')} preview="edit" height={300} />
             </div>
@@ -404,96 +425,96 @@ export default function CMSArchiveForm() {
         <div className="space-y-4">
           <div className="border border-white/10 rounded p-4 space-y-4">
             <h2 className="text-sm text-[#d4a373]">档案影像</h2>
-          <div className="grid grid-cols-2 gap-4">
-            {/* 封面图片 */}
-            <div>
-              {imagePath ? (
-                <div className="relative group cursor-pointer" onClick={() => { setPreviewMedia(getImageUrl(imagePath)); setPreviewType('image') }}>
-                  <img src={getImageUrl(imagePath)} alt="cover" className="w-full aspect-square object-cover rounded border border-white/10" />
-                  <div className="absolute top-2 left-2 text-[10px] bg-black/60 text-white/80 px-2 py-0.5 rounded pointer-events-none">封面</div>
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-                    style={{ background: 'rgba(0,0,0,0.4)' }}>
-                    <div className="flex items-center justify-center h-full">
-                      <svg className="w-5 h-5 text-white/70" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <div className="grid grid-cols-2 gap-4">
+              {/* 封面图片 */}
+              <div>
+                {imagePath ? (
+                  <div className="relative group cursor-pointer" onClick={() => { setPreviewMedia(getImageUrl(imagePath)); setPreviewType('image') }}>
+                    <img src={getImageUrl(imagePath)} alt="cover" className="w-full aspect-square object-cover rounded border border-white/10" />
+                    <div className="absolute top-2 left-2 text-[10px] bg-black/60 text-white/80 px-2 py-0.5 rounded pointer-events-none">封面</div>
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+                      style={{ background: 'rgba(0,0,0,0.4)' }}>
+                      <div className="flex items-center justify-center h-full">
+                        <svg className="w-5 h-5 text-white/70" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ) : (
-                <div
-                  className={`aspect-square rounded border-2 border-dashed flex flex-col items-center justify-center gap-2 transition-colors cursor-pointer ${dragging ? 'border-[#d4a373] bg-[#d4a373]/5' : 'border-white/10 hover:border-white/20'}`}
-                  onDragOver={e => { e.preventDefault(); setDragging(true) }}
-                  onDragLeave={() => setDragging(false)}
-                  onDrop={e => { e.preventDefault(); setDragging(false); if (e.dataTransfer.files[0]) handleImageUpload(e.dataTransfer.files[0]) }}
-                  onClick={() => document.getElementById('cms-archive-img')?.click()}
-                >
-                  {uploading ? <span className="text-xs text-[#888888]">上传中...</span> : (
-                    <>
-                      <svg className="w-6 h-6 text-[#666666]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
-                      <span className="text-xs text-[#666]">封面图片</span>
-                    </>
-                  )}
-                  <input id="cms-archive-img" type="file" accept="image/*" className="hidden" onChange={e => e.target.files?.[0] && handleImageUpload(e.target.files[0])} />
-                </div>
-              )}
-              {imagePath && (
-                <div className="flex gap-2 mt-2">
-                  <button onClick={() => setImagePath('')} className="text-xs text-[#e60012] px-2 py-1 border border-[#e60012]/40 rounded hover:bg-[#e60012]/10">移除</button>
-                  <label className="text-xs text-[#d4a373] px-2 py-1 border border-[#d4a373]/40 rounded cursor-pointer hover:bg-[#d4a373]/10">
-                    更换
-                    <input type="file" accept="image/*" className="hidden" onChange={e => e.target.files?.[0] && handleImageUpload(e.target.files[0])} />
-                  </label>
-                </div>
-              )}
+                ) : (
+                  <div
+                    className={`aspect-square rounded border-2 border-dashed flex flex-col items-center justify-center gap-2 transition-colors cursor-pointer ${dragging ? 'border-[#d4a373] bg-[#d4a373]/5' : 'border-white/10 hover:border-white/20'}`}
+                    onDragOver={e => { e.preventDefault(); setDragging(true) }}
+                    onDragLeave={() => setDragging(false)}
+                    onDrop={e => { e.preventDefault(); setDragging(false); if (e.dataTransfer.files[0]) handleImageUpload(e.dataTransfer.files[0]) }}
+                    onClick={() => document.getElementById('cms-archive-img')?.click()}
+                  >
+                    {uploading ? <span className="text-xs text-[#888888]">上传中...</span> : (
+                      <>
+                        <svg className="w-6 h-6 text-[#666666]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
+                        <span className="text-xs text-[#666]">封面图片</span>
+                      </>
+                    )}
+                    <input id="cms-archive-img" type="file" accept="image/*" className="hidden" onChange={e => e.target.files?.[0] && handleImageUpload(e.target.files[0])} />
+                  </div>
+                )}
+                {imagePath && (
+                  <div className="flex gap-2 mt-2">
+                    <button onClick={() => setImagePath('')} className="text-xs text-[#e60012] px-2 py-1 border border-[#e60012]/40 rounded hover:bg-[#e60012]/10">移除</button>
+                    <label className="text-xs text-[#d4a373] px-2 py-1 border border-[#d4a373]/40 rounded cursor-pointer hover:bg-[#d4a373]/10">
+                      更换
+                      <input type="file" accept="image/*" className="hidden" onChange={e => e.target.files?.[0] && handleImageUpload(e.target.files[0])} />
+                    </label>
+                  </div>
+                )}
+              </div>
+
+              {/* 档案视频 */}
+              <div>
+                {videoPath ? (
+                  <div className="relative group cursor-pointer" onClick={() => { setPreviewMedia(getImageUrl(videoPath)); setPreviewType('video') }}>
+                    <video src={getImageUrl(videoPath)} className="w-full aspect-square object-cover rounded border border-white/10" />
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <div className="w-12 h-12 rounded-full bg-black/60 flex items-center justify-center">
+                        <svg className="w-6 h-6 text-white ml-0.5" viewBox="0 0 24 24" fill="currentColor"><polygon points="8 5 19 12 8 19 8 5" /></svg>
+                      </div>
+                    </div>
+                    <div className="absolute top-2 left-2 text-[10px] bg-black/60 text-white/80 px-2 py-0.5 rounded pointer-events-none">视频</div>
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+                      style={{ background: 'rgba(0,0,0,0.4)' }}>
+                      <div className="flex items-center justify-center h-full">
+                        <svg className="w-5 h-5 text-white/70" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    className={`aspect-square rounded border-2 border-dashed flex flex-col items-center justify-center gap-2 transition-colors cursor-pointer ${dragging ? 'border-[#d4a373] bg-[#d4a373]/5' : 'border-white/10 hover:border-white/20'}`}
+                    onDragOver={e => { e.preventDefault(); setDragging(true) }}
+                    onDragLeave={() => setDragging(false)}
+                    onDrop={e => { e.preventDefault(); setDragging(false); if (e.dataTransfer.files[0]) handleVideoUpload(e.dataTransfer.files[0]) }}
+                    onClick={() => document.getElementById('cms-archive-video')?.click()}
+                  >
+                    {uploading ? <span className="text-xs text-[#888888]">上传中...</span> : (
+                      <>
+                        <svg className="w-6 h-6 text-[#666666]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="2" y="3" width="20" height="18" rx="2" /><polygon points="10 8 16 12 10 16 10 8" fill="currentColor" /></svg>
+                        <span className="text-xs text-[#666]">档案视频</span>
+                      </>
+                    )}
+                    <input id="cms-archive-video" type="file" accept="video/*" className="hidden" onChange={e => e.target.files?.[0] && handleVideoUpload(e.target.files[0])} />
+                  </div>
+                )}
+                {videoPath && (
+                  <div className="flex gap-2 mt-2">
+                    <button onClick={() => setVideoPath('')} className="text-xs text-[#e60012] px-2 py-1 border border-[#e60012]/40 rounded hover:bg-[#e60012]/10">移除</button>
+                    <label className="text-xs text-[#d4a373] px-2 py-1 border border-[#d4a373]/40 rounded cursor-pointer hover:bg-[#d4a373]/10">
+                      更换
+                      <input type="file" accept="video/*" className="hidden" onChange={e => e.target.files?.[0] && handleVideoUpload(e.target.files[0])} />
+                    </label>
+                  </div>
+                )}
+              </div>
             </div>
-          
-            {/* 档案视频 */}
-            <div>
-              {videoPath ? (
-                <div className="relative group cursor-pointer" onClick={() => { setPreviewMedia(getImageUrl(videoPath)); setPreviewType('video') }}>
-                  <video src={getImageUrl(videoPath)} className="w-full aspect-square object-cover rounded border border-white/10" />
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="w-12 h-12 rounded-full bg-black/60 flex items-center justify-center">
-                      <svg className="w-6 h-6 text-white ml-0.5" viewBox="0 0 24 24" fill="currentColor"><polygon points="8 5 19 12 8 19 8 5" /></svg>
-                    </div>
-                  </div>
-                  <div className="absolute top-2 left-2 text-[10px] bg-black/60 text-white/80 px-2 py-0.5 rounded pointer-events-none">视频</div>
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-                    style={{ background: 'rgba(0,0,0,0.4)' }}>
-                    <div className="flex items-center justify-center h-full">
-                      <svg className="w-5 h-5 text-white/70" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div
-                  className={`aspect-square rounded border-2 border-dashed flex flex-col items-center justify-center gap-2 transition-colors cursor-pointer ${dragging ? 'border-[#d4a373] bg-[#d4a373]/5' : 'border-white/10 hover:border-white/20'}`}
-                  onDragOver={e => { e.preventDefault(); setDragging(true) }}
-                  onDragLeave={() => setDragging(false)}
-                  onDrop={e => { e.preventDefault(); setDragging(false); if (e.dataTransfer.files[0]) handleVideoUpload(e.dataTransfer.files[0]) }}
-                  onClick={() => document.getElementById('cms-archive-video')?.click()}
-                >
-                  {uploading ? <span className="text-xs text-[#888888]">上传中...</span> : (
-                    <>
-                      <svg className="w-6 h-6 text-[#666666]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="2" y="3" width="20" height="18" rx="2" /><polygon points="10 8 16 12 10 16 10 8" fill="currentColor" /></svg>
-                      <span className="text-xs text-[#666]">档案视频</span>
-                    </>
-                  )}
-                  <input id="cms-archive-video" type="file" accept="video/*" className="hidden" onChange={e => e.target.files?.[0] && handleVideoUpload(e.target.files[0])} />
-                </div>
-              )}
-              {videoPath && (
-                <div className="flex gap-2 mt-2">
-                  <button onClick={() => setVideoPath('')} className="text-xs text-[#e60012] px-2 py-1 border border-[#e60012]/40 rounded hover:bg-[#e60012]/10">移除</button>
-                  <label className="text-xs text-[#d4a373] px-2 py-1 border border-[#d4a373]/40 rounded cursor-pointer hover:bg-[#d4a373]/10">
-                    更换
-                    <input type="file" accept="video/*" className="hidden" onChange={e => e.target.files?.[0] && handleVideoUpload(e.target.files[0])} />
-                  </label>
-                </div>
-              )}
-            </div>
-          </div>
-          
-          <h2 className="text-sm text-[#d4a373]">其他信息</h2>
+
+            <h2 className="text-sm text-[#d4a373]">其他信息</h2>
             <div>
               <label className="text-xs text-[#888888] block mb-1">主要危险</label>
               <textarea value={form.mainDangers} onChange={e => handleChange('mainDangers', e.target.value)} rows={2} className="w-full bg-white/5 border border-white/10 rounded px-3 py-2 text-xs focus:border-[#d4a373] focus:outline-none resize-none" />

@@ -5,7 +5,7 @@ export const PERSONNEL_FILES: PersonnelFile[] = [
     id: 'HR-400001',
     code: 'HR-400001',
     title: '人员：戴维·卡特博士 | 履历材料',
-    status: '活跃',
+    status: '在档',
     threatLevel: '不适用',
     threatLevelColor: '不适用',
     archiveDate: '[数据删除]',

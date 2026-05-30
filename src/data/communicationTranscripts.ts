@@ -5,7 +5,7 @@ export const COMMUNICATION_TRANSCRIPTS: CommunicationTranscript[] = [
     id: 'EVT-O2847-COM',
     code: 'EVT-O2847-COM',
     title: '否定之人深度访谈记录合集',
-    status: '活跃',
+    status: '在档',
     threatLevel: '黑色-O',
     threatLevelColor: '黑色',
     archiveDate: '[数据删除]',

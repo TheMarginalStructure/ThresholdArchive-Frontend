@@ -5,7 +5,7 @@ export const EXPERIMENT_LOGS: ExperimentLog[] = [
     id: 'EXP-O0442-V2',
     code: 'EXP-O0442-V2',
     title: '阈界物品共鸣水晶(TMS-O0442-01) 实验记录',
-    status: '活跃',
+    status: '在档',
     threatLevel: '黄色-CP',
     threatLevelColor: '黄色',
     archiveDate: '[数据删除]',
@@ -26,7 +26,7 @@ export const EXPERIMENT_LOGS: ExperimentLog[] = [
       },
       {
         code: 'EXP-O0442',
-        type: '勘探实验记录',
+        type: '勘探记录',
         title: '勘探队"Beta"发现记录',
         relation: '物品来源',
       },

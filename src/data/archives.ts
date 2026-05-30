@@ -7,7 +7,7 @@
 // 通用类型定义
 // --------------------------------------------
 
-export type ArchiveStatus = '活跃' | '封存' | '销毁待定' | '已销毁' 
+export type ArchiveStatus = '在档' | '封存' | '销毁待定' | '已销毁'
 
 export type ThreatLevel = '白色' | '蓝色' | '绿色' | '黄色' | '琥珀色' | '橙色' | '红色' | '黑色'
 
@@ -15,7 +15,7 @@ export type ThreatType = 'E' | 'P' | 'C' | 'T' | 'I' | 'O' | 'CP' | 'EC' | 'OBJ'
 
 export type ArchiveCategory =
   | '阈界档案'
-  | '勘探实验记录'
+  | '勘探记录'
   | '事件报告'
   | '事件通信'
   | '人事档案'
@@ -160,7 +160,7 @@ export interface TeamMember {
 }
 
 export interface ExplorationLog extends ArchiveBase {
-  category: '勘探实验记录'
+  category: '勘探记录'
   missionCode: string
   targetThreshold: string
   team: string
@@ -557,7 +557,7 @@ export type Archive =
 export function getCategoryColor(category: ArchiveCategory): string {
   const colors: Record<ArchiveCategory, string> = {
     '阈界档案': '#e60012',
-    '勘探实验记录': '#d4a373',
+    '勘探记录': '#d4a373',
     '事件报告': '#ff6b6b',
     '事件通信': '#ff6b6b',
     '人事档案': '#4ade80',
@@ -572,7 +572,7 @@ export function getCategoryColor(category: ArchiveCategory): string {
 export function getCategoryCode(category: ArchiveCategory): string {
   const codes: Record<ArchiveCategory, string> = {
     '阈界档案': 'TMS',
-    '勘探实验记录': 'EXP',
+    '勘探记录': 'EXP',
     '事件报告': 'EVT',
     '事件通信': 'COM',
     '人事档案': 'HR',

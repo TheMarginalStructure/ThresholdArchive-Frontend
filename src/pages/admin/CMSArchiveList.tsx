@@ -66,7 +66,7 @@ export default function CMSArchiveList() {
         >
           <option value="">所有类别</option>
           {categories.map(cat => (
-            <option key={cat} value={cat}>{cat === '勘探实验记录' ? '勘探记录' : cat}</option>
+            <option key={cat} value={cat}>{cat === '勘探记录' ? '勘探记录' : cat}</option>
           ))}
         </select>
         <select
@@ -75,7 +75,7 @@ export default function CMSArchiveList() {
           className="bg-white/5 border border-white/10 rounded px-3 py-2 text-xs focus:border-[#d4a373] focus:outline-none"
         >
           <option value="">所有状态</option>
-          <option value="活跃">活跃</option>
+          <option value="在档">在档</option>
           <option value="封存">封存</option>
           <option value="销毁待定">销毁待定</option>
           <option value="已销毁">已销毁</option>
@@ -126,13 +126,12 @@ export default function CMSArchiveList() {
                   <td className="px-4 py-3 text-[#f0f0f0]">{archive.title}</td>
                   <td className="px-4 py-3 text-[#888888]">{archive.category}</td>
                   <td className="px-4 py-3">
-                    <span className={`px-1.5 py-0.5 rounded text-[10px] ${
-                      archive.status === '活跃' ? 'text-[#4ade80] bg-[#4ade80]/10' :
-                      archive.status === '封存' ? 'text-[#d4a373] bg-[#d4a373]/10' :
-                      archive.status === '销毁待定' ? 'text-[#d4a373] bg-[#d4a373]/10' :
-                      archive.status === '已销毁' ? 'text-[#868686] bg-[#868686]/10' :
-                      'text-[#888888] bg-white/5'
-                    }`}>
+                    <span className={`px-1.5 py-0.5 rounded text-[10px] ${archive.status === '在档' ? 'text-[#4ade80] bg-[#4ade80]/10' :
+                        archive.status === '封存' ? 'text-[#d4a373] bg-[#d4a373]/10' :
+                          archive.status === '销毁待定' ? 'text-[#d4a373] bg-[#d4a373]/10' :
+                            archive.status === '已销毁' ? 'text-[#868686] bg-[#868686]/10' :
+                              'text-[#888888] bg-white/5'
+                      }`}>
                       {archive.status}
                     </span>
                   </td>

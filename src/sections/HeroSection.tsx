@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router'
-import Lightbox from '../components/Lightbox'
 import { MONO, BODY } from '../utils/fonts'
 import { api, type ApiSystemAnnouncement } from '../lib/api'
 
@@ -12,7 +11,6 @@ const TYPE_LEVEL_MAP: Record<string, { level: string; color: string }> = {
 }
 
 export default function HeroSection() {
-  const [logoOpen, setLogoOpen] = useState(false)
   const [announcements, setAnnouncements] = useState<ApiSystemAnnouncement[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -25,208 +23,152 @@ export default function HeroSection() {
 
   return (
     <>
+      <style>{`
+        @keyframes marquee {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        .marquee-track { animation: marquee 40s linear infinite; }
+      `}</style>
+
       <section id="hero" className="relative min-h-[calc(100dvh-96px)] overflow-hidden">
-      {/* Background Video */}
-      <video
-        autoPlay
-        muted
-        loop
-        playsInline
-        className="absolute inset-0 w-full h-full object-cover"
-        style={{ filter: 'brightness(0.35)' }}
-      >
-        <source src="/assets/hero-abyss.mp4" type="video/mp4" />
-      </video>
+        {/* Background Video */}
+        <video
+          autoPlay muted loop playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ filter: 'brightness(0.3)' }}
+        >
+          <source src="/assets/hero-void.mp4" type="video/mp4" />
+        </video>
 
-      {/* Dark gradient overlays */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/30 to-[#0a0a0a]/70" />
-      <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a]/60 via-transparent to-[#0a0a0a]/80" />
+        {/* Dark gradient overlays */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/20 to-[#0a0a0a]/60" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a]/70 via-transparent to-[#0a0a0a]/80" />
 
-      {/* Main content: intro + log as a single centered block */}
-      <div className="relative z-10 min-h-[calc(100dvh-96px)] flex items-center justify-center px-6 py-24 lg:py-0">
-        <div className="w-full max-w-[1400px] flex flex-col lg:flex-row items-start gap-8 lg:gap-16">
+        {/* 装饰性光晕 */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-red-900/8 rounded-full blur-[150px] pointer-events-none" />
 
-          {/* Top info bar */}
-          <div className="absolute top-[120px] left-1/2 -translate-x-1/2 w-full max-w-[1400px] z-10 px-6">
-            <div
-              className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 py-3 border-b border-white/10"
-              style={{ fontFamily: MONO }}
-            >
-              <div className="flex items-center gap-3 text-[10px] tracking-[0.2em] uppercase text-[#888888]">
-                <span className="w-8 h-[1px] bg-[#d4a373]/50" />
-                <span className="text-[#d4a373]">THE MARGINAL STRUCTURE</span>
-                <span className="text-[#666666]">/</span>
-                <span>秘密国际组织 · 阈界管理机构</span>
-                <span className="text-[#d4a373] ml-2">■</span>
-                <span>EST. [DATA REDACTED]</span>
-              </div>
-              <div className="flex items-center gap-3 text-[10px] tracking-[0.2em] uppercase text-[#888888]">
-                <span>TICK · v2026.5.25</span>
-              </div>
+        {/* ===== Top Info Bar ===== */}
+        <div className="absolute top-0 left-0 right-0 z-20 px-6 py-4">
+          <div className="max-w-[720px] mx-auto flex items-center justify-between" style={{ fontFamily: MONO }}>
+            <div className="flex items-center gap-3 text-[10px] tracking-[0.2em] uppercase text-[#888888]">
+              <span className="w-6 h-[1px] bg-[#d4a373]/50" />
+              <span className="text-[#d4a373]">THE MARGINAL STRUCTURE</span>
+            </div>
+            <div className="text-[10px] tracking-[0.2em] uppercase text-[#888888]">
+              <span>EST. [DATA REDACTED]</span>
             </div>
           </div>
+        </div>
 
-          {/* Left side - Intro content */}
-          <div className="w-full lg:max-w-[760px] text-left flex flex-col lg:justify-between">
-            <div>
-              {/* Status badge */}
-              <div className="mb-6">
-                <div
-                  className="inline-flex items-center gap-2 px-3 py-1.5 border border-[#e60012]/40 text-[#e60012] text-[10px] tracking-widest"
-                  style={{ fontFamily: MONO }}
-                >
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#e60012] animate-pulse" />
-                  SIGNAL ACTIVE / 当前阈界信号在线
-                </div>
-              </div>
+        {/* 背景Logo水印 */}
+        {/* <div className="absolute inset-0 z-[5] flex items-center justify-center pointer-events-none select-none">
+          <img src="/assets/TheMarginalStructure-Logo.png" alt=""
+            className="w-[280px] md:w-[600px] opacity-[0.06] md:opacity-[0.08]" />
+        </div> */}
+        {/* ===== Main Content (Centered) ===== */}
+        <div className="relative z-10 min-h-[calc(100dvh-96px)] flex items-center justify-center px-6 py-24 pt-0">
+          <div className="w-full max-w-[720px] text-center">
 
-              {/* Main Title with Logo */}
-              <div className="flex items-center gap-3 mb-5">
-                <button
-                  onClick={() => setLogoOpen(true)}
-                  className="w-[100px] h-auto flex-shrink-0 p-0 border-0 bg-transparent cursor-pointer hover:opacity-80 transition-opacity"
-                  data-cursor-hover
-                  type="button"
-                >
-                  <img
-                    src="/assets/TheMarginalStructure-Logo.png"
-                    alt="The Marginal Structure Logo"
-                    className="w-full h-auto"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement
-                      target.style.display = 'none'
-                    }}
-                  />
-                </button>
-                <h1
-                  className="text-6xl md:text-7xl lg:text-8xl text-[#f0f0f0] font-bold leading-[1.05] tracking-tight text-left"
-                  style={{ fontFamily: BODY }}
-                >
-                  边际结构
-                </h1>
-              </div>
+            {/* Status Badge */}
+            <div className="mb-8 flex justify-center">
               <div
-                className="text-lg text-[#888888] tracking-[0.3em] uppercase mb-10 text-left"
+                className="inline-flex items-center gap-2 px-3 py-1.5 border border-[#e60012]/40 text-[#e60012] text-[10px] tracking-widest"
                 style={{ fontFamily: MONO }}
               >
-                THE MARGINAL STRUCTURE
+                <span className="w-1.5 h-1.5 rounded-full bg-[#e60012] animate-pulse" />
+                SIGNAL ACTIVE / 当前阈界信号在线
               </div>
-
-              {/* Subtitle - two lines */}
-              <p className="text-base text-[#888888] leading-relaxed mb-1 text-left">
-                一个致力于管理<span className="text-[#d4a373] font-medium">阈界异常现象</span>的国际秘密组织。
-              </p>
-              <p className="text-base text-[#888888] leading-relaxed mb-4 text-left">
-                「 测绘黑暗，设立路标，而非征服 」
-              </p>
-              <p className="text-xs text-[#888888]/60 tracking-wider mb-12 text-left">
-                MAP THE DARKNESS · SET THE GUIDEPOSTS · NEVER CONQUER
-              </p>
             </div>
 
+            {/* Main Title */}
+            <h1
+              className="text-[clamp(2.8rem,7vw,5.5rem)] text-[#f0f0f0] font-black leading-[1.05] tracking-[0.04em] mb-3 relative z-10"
+              style={{ fontFamily: BODY }}
+            >
+              边际结构
+            </h1>
+            <div className="text-sm md:text-base text-[#888888] tracking-[0.3em] uppercase mb-8" style={{ fontFamily: MONO }}>
+              THE MARGINAL STRUCTURE
+            </div>
+
+            {/* Description */}
+            <p className="text-sm md:text-base text-[#a0a0a0] leading-relaxed mb-6">
+              一个致力于管理<span className="text-[#d4a373] font-medium">阈界异常现象</span>的国际秘密组织。
+            </p>
+
+            {/* Motto */}
+            <p className="text-lg md:text-xl text-[#d4d4d4] font-medium tracking-wide leading-relaxed mb-2">
+              测绘黑暗，设立路标，<span className="text-white font-semibold">而非征服</span>
+            </p>
+            <p className="text-[10px] md:text-[11px] text-[#888888]/40 tracking-[0.25em] mb-10 uppercase" style={{ fontFamily: MONO }}>
+              MAP THE DARKNESS · SET THE GUIDEPOSTS · NEVER CONQUER
+            </p>
+
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
                 to="/archives"
-                className="inline-flex items-center gap-2 bg-[#e60012] text-white px-6 py-3 text-sm font-medium hover:bg-[#c40010] transition-colors duration-300"
+                className="group inline-flex items-center gap-2 bg-gradient-to-br from-[#e60012] to-[#b8000e] text-white px-8 py-3.5 text-sm font-medium rounded-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_-8px_rgba(230,0,18,0.5)]"
                 data-cursor-hover
               >
                 访问档案库
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg className="w-4 h-4 transition-transform group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
               </Link>
               <Link
                 to="/operations"
-                className="inline-flex items-center gap-2 border border-white/20 text-[#f0f0f0] px-6 py-3 text-sm hover:border-[#d4a373] hover:text-[#d4a373] transition-colors duration-300"
+                className="group inline-flex items-center gap-2 border border-white/20 text-[#f0f0f0] px-8 py-3.5 text-sm rounded-sm transition-all duration-300 hover:border-[#d4a373]/60 hover:bg-[#d4a373]/5 hover:text-[#d4a373] hover:-translate-y-0.5"
                 data-cursor-hover
               >
                 查看行动计划
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg className="w-4 h-4 transition-transform group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
               </Link>
             </div>
+
           </div>
+        </div>
 
-          {/* Right side - Server Log Panel */}
-          <div className="w-full lg:w-[380px] flex-shrink-0">
-            <div
-              className="border border-white/10 overflow-hidden"
-              style={{ background: 'rgba(10, 10, 10, 0.75)', backdropFilter: 'blur(16px)' }}
-            >
-              {/* Panel Header */}
-              <div
-                className="flex items-center justify-between px-4 py-3 border-b border-white/10"
-                style={{ fontFamily: MONO }}
-              >
-                <div className="flex items-center gap-2">
-                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#e60012] animate-pulse" />
-                  <span className="text-[10px] text-[#d4a373] tracking-wider">SERVER LOG / 系统公告</span>
-                </div>
-                <span className="text-[10px] text-[#888888]">v2026.5.6</span>
-              </div>
-
-              {/* Log Entries */}
-              <div className="max-h-[400px] overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
-                {loading ? (
-                  <div className="px-4 py-8 text-center"><div className="text-xs text-[#666] animate-pulse">加载公告中...</div></div>
-                ) : announcements.length === 0 ? (
-                  <div className="px-4 py-8 text-center"><div className="text-xs text-[#666]">暂无公告</div></div>
-                ) : (
-                  announcements.map((announcement) => {
-                    const typeInfo = TYPE_LEVEL_MAP[announcement.type] || TYPE_LEVEL_MAP.info
-                    const dateStr = new Date(announcement.createdAt).toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '.')
-                    return (
-                      <div key={announcement.id} className="flex items-start gap-3 px-4 py-2.5 border-b border-white/5 last:border-b-0 hover:bg-white/[0.02] transition-colors">
-                        <span
-                          className="text-[9px] px-1.5 py-0.5 mt-0.5 flex-shrink-0 leading-none"
-                          style={{ color: typeInfo.color, border: `1px solid ${typeInfo.color}60`, fontFamily: MONO }}
-                        >
-                          {typeInfo.level}
-                        </span>
-                        <div className="flex-1 min-w-0">
-                          <span className="text-[10px] text-[#888888]/60 block mb-0.5" style={{ fontFamily: MONO }}>
-                            {dateStr}
-                          </span>
-                          <span className="text-xs text-[#888888] leading-relaxed block">
-                            {announcement.title}
-                          </span>
-                          {announcement.content && (
-                            <span className="text-[10px] text-[#666] leading-relaxed block mt-0.5 line-clamp-2">
-                              {announcement.content}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    )
-                  })
-                )}
-              </div>
-
-              {/* Panel Footer */}
-              <div className="px-4 py-3 border-t border-white/10">
-                <Link
-                  to="/news"
-                  className="text-xs text-[#d4a373] hover:text-[#e60012] transition-colors flex items-center gap-1"
-                  style={{ fontFamily: MONO }}
-                  data-cursor-hover
-                >
-                  查看全部公告 ↗
-                </Link>
+        {/* ===== Bottom Info Bar ===== */}
+        <div className="absolute bottom-0 left-0 right-0 z-20" style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(10px)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+          <div className="w-full mx-auto px-6 py-3 flex items-center justify-between gap-4">
+            {/* Left: Signal Status */}
+            <div className="flex items-center gap-3 text-[10px] font-mono flex-shrink-0">
+              <div className="flex items-center gap-2 px-2.5 py-1 border border-red-900/30 rounded" style={{ background: 'rgba(127, 23, 23, 0.15)' }}>
+                <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
+                <span className="text-red-400 tracking-wider">SIGNAL ACTIVE</span>
               </div>
             </div>
-          </div>
 
+            {/* Center: Marquee */}
+            <div className="flex-1 min-w-0 overflow-hidden" style={{ maskImage: 'linear-gradient(to right, transparent, black 5%, black 95%, transparent)' }}>
+              <div className="marquee-track flex gap-12 text-[10px] font-mono text-gray-500 whitespace-nowrap w-max">
+                {[...announcements, ...announcements].map((a, i) => {
+                  if (!a) return null
+                  const typeInfo = TYPE_LEVEL_MAP[a.type] || TYPE_LEVEL_MAP.info
+                  return (
+                    <span key={i} className="flex items-center gap-2">
+                      <span className="px-1 py-0.5 text-[8px] leading-none rounded" style={{ color: typeInfo.color, background: `${typeInfo.color}15`, border: `1px solid ${typeInfo.color}30` }}>
+                        {typeInfo.level}
+                      </span>
+                      <span>{new Date(a.createdAt).toLocaleDateString('zh-CN').replace(/\//g, '.')} {a.title}</span>
+                    </span>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Right: Version */}
+            <div className="flex items-center gap-3 text-[10px] font-mono text-gray-600 flex-shrink-0">
+              <span className="w-1.5 h-1.5 bg-green-500/50 rounded-full" />
+              <span className="tracking-wider">v2026.5.6</span>
+            </div>
+          </div>
         </div>
-      </div>
-    </section>
-    <Lightbox
-      isOpen={logoOpen}
-      src="/assets/TheMarginalStructure-Logo.png"
-      alt="边际结构 · THE MARGINAL STRUCTURE"
-      onClose={() => setLogoOpen(false)}
-    />
+      </section>
     </>
   )
 }

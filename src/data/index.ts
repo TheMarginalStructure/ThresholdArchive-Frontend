@@ -33,7 +33,7 @@ export const ALL_ARCHIVES: Archive[] = [
 // 按类别分组的档案
 export const ARCHIVES_BY_CATEGORY: Record<ArchiveCategory, Archive[]> = {
   '阈界档案': THREAT_FILES,
-  '勘探实验记录': EXPLORATION_LOGS,
+  '勘探记录': EXPLORATION_LOGS,
   '事件报告': INCIDENT_REPORTS,
   '事件通信': COMMUNICATION_TRANSCRIPTS,
   '人事档案': PERSONNEL_FILES,
@@ -83,7 +83,7 @@ export const ARCHIVE_CATEGORIES: { category: ArchiveCategory; code: string; desc
     description: '对特定阈界、阈界内实体或异常物体的详细描述和分析',
   },
   {
-    category: '勘探实验记录',
+    category: '勘探记录',
     code: 'EXP',
     description: '记录对未知或部分未知阈界的勘探行动',
   },

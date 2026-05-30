@@ -27,7 +27,7 @@ export default function AnomalyArchives() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    api.archives.list({ limit: '6', page: '1', status: '活跃' })
+    api.archives.list({ limit: '6', page: '1', status: '在档' })
       .then((res) => {
         setArchives(res.data)
         setTotal(res.meta.total)

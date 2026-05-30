@@ -5,7 +5,7 @@ export const THEORETICAL_DOCUMENTS: TheoreticalDocument[] = [
     id: 'THY-O0881',
     code: 'THY-O0881',
     title: '《论万花筒殿(TMS-O0881)的"认知海绵"同化模型及潜在应对策略》',
-    status: '活跃',
+    status: '在档',
     threatLevel: '琥珀色-C',
     threatLevelColor: '琥珀色',
     archiveDate: '[艾伦·凯状态变更为MIA后30日]',
@@ -20,7 +20,7 @@ export const THEORETICAL_DOCUMENTS: TheoreticalDocument[] = [
     relatedArchives: [
       {
         code: 'EXP-O0881',
-        type: '勘探实验记录',
+        type: '勘探记录',
         title: '万花筒殿勘探日志',
         relation: '核心案例分析',
       },
@@ -263,7 +263,7 @@ export const THEORETICAL_DOCUMENTS: TheoreticalDocument[] = [
     id: 'THY-L0234',
     code: 'THY-L0234',
     title: '《"不可知知识"模因传播模型》',
-    status: '活跃',
+    status: '在档',
     threatLevel: '高（认知危害，模因危害）',
     threatLevelColor: '红色',
     archiveDate: '2025年9月4日',
@@ -278,7 +278,7 @@ export const THEORETICAL_DOCUMENTS: TheoreticalDocument[] = [
     relatedArchives: [
       {
         code: 'EXP-L0234',
-        type: '勘探实验记录',
+        type: '勘探记录',
         title: '明知山首次勘探报告',
         relation: '提供初始观测数据',
       },
