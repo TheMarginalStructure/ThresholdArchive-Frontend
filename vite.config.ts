@@ -11,7 +11,6 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api/v1/uploads': 'http://localhost:3001',
-      '/api/v1/assets': 'http://localhost:3001',
     },
   },
   resolve: {

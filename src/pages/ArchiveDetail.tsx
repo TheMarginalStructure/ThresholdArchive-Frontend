@@ -1601,8 +1601,8 @@ function PersonnelFileContent({ details: _details }: { details: Record<string, u
           <div className="space-y-1">
             {details.archiveChanges.map((change: Record<string, unknown>, i: number) => (
               <div key={i} className="flex items-start gap-2 text-xs">
-                <span className="text-[#d4a373] whitespace-nowrap" style={{ fontFamily: MONO }}>{String(change.date || '')}</span>
-                <span className="text-[#888888]">{String(change.description || '')}</span>
+                <span className="text-[#d4a373] whitespace-nowrap" style={{ fontFamily: MONO }}>{String(change.time || change.date || '')}</span>
+                <span className="text-[#888888]">{String(change.content || change.description || '')}</span>
               </div>
             ))}
           </div>

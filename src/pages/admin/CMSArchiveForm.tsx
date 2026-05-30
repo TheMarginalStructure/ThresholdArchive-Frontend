@@ -7,9 +7,11 @@ import { api } from '../../lib/api'
 const API_BASE = 'http://localhost:3001/api/v1'
 
 interface SignatureEntry {
-  personId: string
+  personnelId: string
   position: string
   note: string
+  name?: string
+  esigCode?: string
 }
 
 export default function CMSArchiveForm() {
@@ -35,6 +37,8 @@ export default function CMSArchiveForm() {
   const [dragging, setDragging] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [templates, setTemplates] = useState<any[]>([])
+  const [previewMedia, setPreviewMedia] = useState<string | null>(null)
+  const [previewType, setPreviewType] = useState<'image' | 'video'>('image')
 
   const getImageUrl = (path: string) => {
     if (!path) return ''
@@ -76,7 +80,13 @@ export default function CMSArchiveForm() {
             sourceDepartmentId: data.sourceDepartmentId ? String(data.sourceDepartmentId) : '',
             responsibleDepartmentId: data.responsibleDepartmentId ? String(data.responsibleDepartmentId) : '',
             leadPersonId: data.leadPersonId ? String(data.leadPersonId) : '',
-            signatures: data.signatures || [],
+            signatures: (data.signatures || []).map((sig: any) => ({
+              personnelId: sig.personnelId ? String(sig.personnelId) : '',
+              position: sig.position || '',
+              note: sig.note || '',
+              name: sig.personnel?.name || sig.name || '',
+              esigCode: sig.personnel?.esigCode || sig.esigCode || '',
+            })),
             customTemplate: data.customTemplate || '',
             useCustomTemplate: data.useCustomTemplate || false,
           })
@@ -255,7 +265,7 @@ export default function CMSArchiveForm() {
             <h2 className="text-sm text-[#d4a373]">签名确认</h2>
             <div className="space-y-3">
               {form.signatures.map((sig, i) => {
-                const selectedPerson = personnel.find(p => String(p.id) === sig.personId)
+                const selectedPerson = personnel.find(p => String(p.id) === sig.personnelId)
                 return (
                   <div key={i} className="border border-white/10 rounded p-3 space-y-2 relative">
                     <button
@@ -272,13 +282,13 @@ export default function CMSArchiveForm() {
                       <div>
                         <label className="text-xs text-[#888888] block mb-1">签名人员</label>
                         <select
-                          value={sig.personId}
+                          value={sig.personnelId}
                           onChange={(e) => {
                             const newSignatures = [...form.signatures]
                             const person = personnel.find(p => String(p.id) === e.target.value)
                             newSignatures[i] = {
                               ...newSignatures[i],
-                              personId: e.target.value,
+                              personnelId: e.target.value,
                               position: person?.position || newSignatures[i].position,
                             }
                             setForm(prev => ({ ...prev, signatures: newSignatures }))
@@ -316,9 +326,9 @@ export default function CMSArchiveForm() {
                         className="w-full bg-white/5 border border-white/10 rounded px-3 py-2 text-xs focus:border-[#d4a373] focus:outline-none"
                       />
                     </div>
-                    {selectedPerson && (
+                    {(selectedPerson || sig.name) && (
                       <div className="text-xs text-[#666]">
-                        电子签名: {selectedPerson.esigCode || '[ESIG-??]'}
+                        电子签名: {selectedPerson?.esigCode || sig.esigCode || '[ESIG-??]'} · {selectedPerson?.name || sig.name}
                       </div>
                     )}
                   </div>
@@ -328,7 +338,7 @@ export default function CMSArchiveForm() {
                 type="button"
                 onClick={() => setForm(prev => ({
                   ...prev,
-                  signatures: [...prev.signatures, { personId: '', position: '', note: '' }],
+                  signatures: [...prev.signatures, { personnelId: '', position: '', note: '' }],
                 }))}
                 className="text-[#d4a373] hover:text-[#c49463] text-xs flex items-center gap-1"
               >
@@ -393,71 +403,97 @@ export default function CMSArchiveForm() {
 
         <div className="space-y-4">
           <div className="border border-white/10 rounded p-4 space-y-4">
-            <h2 className="text-sm text-[#d4a373]">封面图片</h2>
-            {imagePath ? (
-              <div className="relative group">
-                <img src={getImageUrl(imagePath)} alt="cover" className="w-full aspect-square object-cover rounded border border-white/10" />
-                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                  <button onClick={() => setImagePath('')} className="text-xs text-[#e60012] px-3 py-1 border border-[#e60012] rounded">移除</button>
-                  <label className="text-xs text-[#d4a373] px-3 py-1 border border-[#d4a373] rounded cursor-pointer">
+            <h2 className="text-sm text-[#d4a373]">档案影像</h2>
+          <div className="grid grid-cols-2 gap-4">
+            {/* 封面图片 */}
+            <div>
+              {imagePath ? (
+                <div className="relative group cursor-pointer" onClick={() => { setPreviewMedia(getImageUrl(imagePath)); setPreviewType('image') }}>
+                  <img src={getImageUrl(imagePath)} alt="cover" className="w-full aspect-square object-cover rounded border border-white/10" />
+                  <div className="absolute top-2 left-2 text-[10px] bg-black/60 text-white/80 px-2 py-0.5 rounded pointer-events-none">封面</div>
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+                    style={{ background: 'rgba(0,0,0,0.4)' }}>
+                    <div className="flex items-center justify-center h-full">
+                      <svg className="w-5 h-5 text-white/70" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div
+                  className={`aspect-square rounded border-2 border-dashed flex flex-col items-center justify-center gap-2 transition-colors cursor-pointer ${dragging ? 'border-[#d4a373] bg-[#d4a373]/5' : 'border-white/10 hover:border-white/20'}`}
+                  onDragOver={e => { e.preventDefault(); setDragging(true) }}
+                  onDragLeave={() => setDragging(false)}
+                  onDrop={e => { e.preventDefault(); setDragging(false); if (e.dataTransfer.files[0]) handleImageUpload(e.dataTransfer.files[0]) }}
+                  onClick={() => document.getElementById('cms-archive-img')?.click()}
+                >
+                  {uploading ? <span className="text-xs text-[#888888]">上传中...</span> : (
+                    <>
+                      <svg className="w-6 h-6 text-[#666666]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
+                      <span className="text-xs text-[#666]">封面图片</span>
+                    </>
+                  )}
+                  <input id="cms-archive-img" type="file" accept="image/*" className="hidden" onChange={e => e.target.files?.[0] && handleImageUpload(e.target.files[0])} />
+                </div>
+              )}
+              {imagePath && (
+                <div className="flex gap-2 mt-2">
+                  <button onClick={() => setImagePath('')} className="text-xs text-[#e60012] px-2 py-1 border border-[#e60012]/40 rounded hover:bg-[#e60012]/10">移除</button>
+                  <label className="text-xs text-[#d4a373] px-2 py-1 border border-[#d4a373]/40 rounded cursor-pointer hover:bg-[#d4a373]/10">
                     更换
                     <input type="file" accept="image/*" className="hidden" onChange={e => e.target.files?.[0] && handleImageUpload(e.target.files[0])} />
                   </label>
                 </div>
-              </div>
-            ) : (
-              <div
-                className={`aspect-square rounded border-2 border-dashed flex flex-col items-center justify-center gap-2 transition-colors cursor-pointer ${dragging ? 'border-[#d4a373] bg-[#d4a373]/5' : 'border-white/10 hover:border-white/20'}`}
-                onDragOver={e => { e.preventDefault(); setDragging(true) }}
-                onDragLeave={() => setDragging(false)}
-                onDrop={e => { e.preventDefault(); setDragging(false); if (e.dataTransfer.files[0]) handleImageUpload(e.dataTransfer.files[0]) }}
-                onClick={() => document.getElementById('cms-archive-img')?.click()}
-              >
-                {uploading ? <span className="text-xs text-[#888888]">上传中...</span> : (
-                  <>
-                    <svg className="w-6 h-6 text-[#666666]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
-                    <span className="text-xs text-[#666]">拖拽或点击上传</span>
-                  </>
-                )}
-                <input id="cms-archive-img" type="file" accept="image/*" className="hidden" onChange={e => e.target.files?.[0] && handleImageUpload(e.target.files[0])} />
-              </div>
-            )}
-          </div>
-
-          <div className="border border-white/10 rounded p-4 space-y-4">
-            <h2 className="text-sm text-[#d4a373]">档案视频</h2>
-            {videoPath ? (
-              <div className="relative group">
-                <video src={getImageUrl(videoPath)} controls className="w-full aspect-square object-cover rounded border border-white/10" />
-                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                  <button onClick={() => setVideoPath('')} className="text-xs text-[#e60012] px-3 py-1 border border-[#e60012] rounded">移除</button>
-                  <label className="text-xs text-[#d4a373] px-3 py-1 border border-[#d4a373] rounded cursor-pointer">
+              )}
+            </div>
+          
+            {/* 档案视频 */}
+            <div>
+              {videoPath ? (
+                <div className="relative group cursor-pointer" onClick={() => { setPreviewMedia(getImageUrl(videoPath)); setPreviewType('video') }}>
+                  <video src={getImageUrl(videoPath)} className="w-full aspect-square object-cover rounded border border-white/10" />
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="w-12 h-12 rounded-full bg-black/60 flex items-center justify-center">
+                      <svg className="w-6 h-6 text-white ml-0.5" viewBox="0 0 24 24" fill="currentColor"><polygon points="8 5 19 12 8 19 8 5" /></svg>
+                    </div>
+                  </div>
+                  <div className="absolute top-2 left-2 text-[10px] bg-black/60 text-white/80 px-2 py-0.5 rounded pointer-events-none">视频</div>
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+                    style={{ background: 'rgba(0,0,0,0.4)' }}>
+                    <div className="flex items-center justify-center h-full">
+                      <svg className="w-5 h-5 text-white/70" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div
+                  className={`aspect-square rounded border-2 border-dashed flex flex-col items-center justify-center gap-2 transition-colors cursor-pointer ${dragging ? 'border-[#d4a373] bg-[#d4a373]/5' : 'border-white/10 hover:border-white/20'}`}
+                  onDragOver={e => { e.preventDefault(); setDragging(true) }}
+                  onDragLeave={() => setDragging(false)}
+                  onDrop={e => { e.preventDefault(); setDragging(false); if (e.dataTransfer.files[0]) handleVideoUpload(e.dataTransfer.files[0]) }}
+                  onClick={() => document.getElementById('cms-archive-video')?.click()}
+                >
+                  {uploading ? <span className="text-xs text-[#888888]">上传中...</span> : (
+                    <>
+                      <svg className="w-6 h-6 text-[#666666]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="2" y="3" width="20" height="18" rx="2" /><polygon points="10 8 16 12 10 16 10 8" fill="currentColor" /></svg>
+                      <span className="text-xs text-[#666]">档案视频</span>
+                    </>
+                  )}
+                  <input id="cms-archive-video" type="file" accept="video/*" className="hidden" onChange={e => e.target.files?.[0] && handleVideoUpload(e.target.files[0])} />
+                </div>
+              )}
+              {videoPath && (
+                <div className="flex gap-2 mt-2">
+                  <button onClick={() => setVideoPath('')} className="text-xs text-[#e60012] px-2 py-1 border border-[#e60012]/40 rounded hover:bg-[#e60012]/10">移除</button>
+                  <label className="text-xs text-[#d4a373] px-2 py-1 border border-[#d4a373]/40 rounded cursor-pointer hover:bg-[#d4a373]/10">
                     更换
                     <input type="file" accept="video/*" className="hidden" onChange={e => e.target.files?.[0] && handleVideoUpload(e.target.files[0])} />
                   </label>
                 </div>
-              </div>
-            ) : (
-              <div
-                className={`aspect-square rounded border-2 border-dashed flex flex-col items-center justify-center gap-2 transition-colors cursor-pointer ${dragging ? 'border-[#d4a373] bg-[#d4a373]/5' : 'border-white/10 hover:border-white/20'}`}
-                onDragOver={e => { e.preventDefault(); setDragging(true) }}
-                onDragLeave={() => setDragging(false)}
-                onDrop={e => { e.preventDefault(); setDragging(false); if (e.dataTransfer.files[0]) handleVideoUpload(e.dataTransfer.files[0]) }}
-                onClick={() => document.getElementById('cms-archive-video')?.click()}
-              >
-                {uploading ? <span className="text-xs text-[#888888]">上传中...</span> : (
-                  <>
-                    <svg className="w-6 h-6 text-[#666666]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="2" y="3" width="20" height="18" rx="2" /><polygon points="10 8 16 12 10 16 10 8" fill="currentColor" /></svg>
-                    <span className="text-xs text-[#666]">上传视频（MP4/WebM）</span>
-                  </>
-                )}
-                <input id="cms-archive-video" type="file" accept="video/*" className="hidden" onChange={e => e.target.files?.[0] && handleVideoUpload(e.target.files[0])} />
-              </div>
-            )}
+              )}
+            </div>
           </div>
-
-          <div className="border border-white/10 rounded p-4 space-y-4">
-            <h2 className="text-sm text-[#d4a373]">其他信息</h2>
+          
+          <h2 className="text-sm text-[#d4a373]">其他信息</h2>
             <div>
               <label className="text-xs text-[#888888] block mb-1">主要危险</label>
               <textarea value={form.mainDangers} onChange={e => handleChange('mainDangers', e.target.value)} rows={2} className="w-full bg-white/5 border border-white/10 rounded px-3 py-2 text-xs focus:border-[#d4a373] focus:outline-none resize-none" />
@@ -473,6 +509,22 @@ export default function CMSArchiveForm() {
           </div>
         </div>
       </div>
+
+      {/* 图片/视频预览弹窗 */}
+      {previewMedia && (
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-8" onClick={() => setPreviewMedia(null)}>
+          <div className="relative max-w-4xl max-h-[90vh] w-full" onClick={e => e.stopPropagation()}>
+            <button onClick={() => setPreviewMedia(null)} className="absolute -top-10 right-0 text-white/60 hover:text-white text-sm transition-colors">
+              关闭 ✕
+            </button>
+            {previewType === 'image' ? (
+              <img src={previewMedia} alt="preview" className="w-full h-auto max-h-[85vh] object-contain rounded" />
+            ) : (
+              <video src={previewMedia} controls autoPlay className="w-full h-auto max-h-[85vh] object-contain rounded" />
+            )}
+          </div>
+        </div>
+      )}
     </CMSLayout>
   )
 }
