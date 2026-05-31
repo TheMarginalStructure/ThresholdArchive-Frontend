@@ -9,13 +9,13 @@ const LOGISTICS_STATS = [
 ]
 
 const FACILITIES = [
-  { name: 'Site-01 总部', type: '行政/研究', status: '正常运行', capacity: '120人', maintenance: '良好' },
-  { name: 'Site-02 医疗中心', type: '医疗/心理', status: '正常运行', capacity: '40人', maintenance: '良好' },
-  { name: 'Site-03 外勤基地', type: '行动/训练', status: '正常运行', capacity: '60人', maintenance: '一般' },
-  { name: 'Site-04 研究设施', type: '研究/实验', status: '正常运行', capacity: '35人', maintenance: '良好' },
-  { name: 'Site-05 仓储中心', type: '仓储/物流', status: '正常运行', capacity: '20人', maintenance: '良好' },
-  { name: 'Site-06 训练场', type: '训练/模拟', status: '维护中', capacity: '50人', maintenance: '检修中' },
-  { name: 'Site-07 观测站', type: '观测/监控', status: '部分运行', capacity: '15人', maintenance: '故障' },
+  { name: 'Site-5001 安全部总部', type: '行政/研究', status: '正常运行', capacity: '120人', maintenance: '良好' },
+  { name: 'Site-4001 医疗中心', type: '医疗/心理', status: '正常运行', capacity: '40人', maintenance: '良好' },
+  { name: 'Site-2001 外勤基地', type: '行动/训练', status: '正常运行', capacity: '60人', maintenance: '一般' },
+  { name: 'Site-3001 研究设施', type: '研究/实验', status: '正常运行', capacity: '35人', maintenance: '良好' },
+  { name: 'Site-6001 后勤部总部', type: '仓储/物流', status: '正常运行', capacity: '20人', maintenance: '良好' },
+  { name: 'Site-2002 训练场', type: '训练/模拟', status: '维护中', capacity: '50人', maintenance: '检修中' },
+  { name: 'Site-1001 观测站', type: '观测/监控', status: '部分运行', capacity: '15人', maintenance: '故障' },
 ]
 
 const SUPPLY_STATUS = [
@@ -28,10 +28,10 @@ const SUPPLY_STATUS = [
 ]
 
 const MAINTENANCE_SCHEDULE = [
-  { date: '2026-05-28', facility: 'Site-06 训练场', type: '例行维护', priority: '中', status: '计划中' },
-  { date: '2026-05-29', facility: 'Site-07 观测站', type: '故障修复', priority: '高', status: '计划中' },
-  { date: '2026-06-02', facility: 'Site-03 外勤基地', type: '设备升级', priority: '中', status: '计划中' },
-  { date: '2026-06-05', facility: 'Site-01 总部', type: '系统检查', priority: '低', status: '计划中' },
+  { date: '2026-05-28', facility: 'Site-2002 训练场', type: '例行维护', priority: '中', status: '计划中' },
+  { date: '2026-05-29', facility: 'Site-1001 观测站', type: '故障修复', priority: '高', status: '计划中' },
+  { date: '2026-06-02', facility: 'Site-2001 外勤基地', type: '设备升级', priority: '中', status: '计划中' },
+  { date: '2026-06-05', facility: 'Site-5001 安全部总部', type: '系统检查', priority: '低', status: '计划中' },
 ]
 
 export default function LogisticsInfrastructure() {
@@ -50,7 +50,7 @@ export default function LogisticsInfrastructure() {
           <div className="max-w-6xl mx-auto">
             <div className="flex items-center gap-3 mb-6">
               <span className="text-[#d4a373] text-xs tracking-widest" style={{ fontFamily: MONO }}>
-                [DEPT-50]
+                [DEPT-60]
               </span>
               <span className="text-[#666666]">/</span>
               <span className="text-[#888888] text-xs" style={{ fontFamily: MONO }}>
@@ -237,9 +237,9 @@ export default function LogisticsInfrastructure() {
               <div>
                 <h3 className="text-lg text-[#f0f0f0] font-bold mb-4">联系方式</h3>
                 <div className="space-y-2 text-sm text-[#888888]">
-                  <p>内部频道: DEPT-50-COM</p>
-                  <p>物资申请: 5000-50-0010</p>
-                  <p>后勤中心: Site-05 / 后勤与架构部大楼</p>
+                  <p>内部频道: DEPT-60-COM</p>
+                  <p>物资申请: 6000-60-0010</p>
+                  <p>后勤中心: Site-6001 / 后勤与架构部总部</p>
                 </div>
               </div>
             </div>

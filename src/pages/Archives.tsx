@@ -102,7 +102,7 @@ export default function Archives() {
 
   return (
     <PageLayout
-      breadcrumbs={[{ label: 'ARCHIVES' }, { label: '档案库' }]}
+      breadcrumbs={[{ label: '档案库' }]}
       title="档案库 / Archive Database"
       subtitle={`所有已归档的阈界异常现象与组织文件。共计 ${total} 条记录。`}
     >
@@ -117,7 +117,7 @@ export default function Archives() {
               }`}
             data-cursor-hover
           >
-            全部 {total}
+            全部 {categories.reduce((s, c) => s + c.count, 0)}
           </button>
           {categories.map((cat) => (
             <button

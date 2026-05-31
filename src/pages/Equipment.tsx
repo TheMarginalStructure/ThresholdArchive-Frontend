@@ -29,7 +29,7 @@ export default function Equipment() {
 
   return (
     <PageLayout
-      breadcrumbs={[{ label: 'EQUIPMENT' }, { label: '物资管理' }]}
+      breadcrumbs={[{ label: '物资管理' }]}
       title="物资管理 / Equipment"
       subtitle="土块、石块、砖块三种货币，三种代价。本库唯一能从任务中 earned 的入口；多数真正需要的物资长期停止配给。"
     >

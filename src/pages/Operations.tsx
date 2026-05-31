@@ -18,7 +18,7 @@ export default function Operations() {
 
   return (
     <PageLayout
-      breadcrumbs={[{ label: 'OPERATIONS' }, { label: '任务中心' }]}
+      breadcrumbs={[{ label: '任务中心' }]}
       title="行动计划 / Operations"
       subtitle="系统每天给您发两份日常简报 · 您给自己定主线和支线。其余的事——全域共建、同事互助——请前往隔壁两个房间。"
     >

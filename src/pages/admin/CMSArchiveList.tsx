@@ -47,9 +47,11 @@ export default function CMSArchiveList() {
   const categories = [...new Set(archives.map(a => a.category))].sort()
   const threatLevels = [...new Set(archives.map(a => a.threatLevel).filter(Boolean))].sort()
 
+  // Use URL searchParams as authoritative source for category filter
+  const activeCategory = searchParams.get('category') || filter.category
   const filtered = archives.filter(a => {
     if (filter.search && !a.title.toLowerCase().includes(filter.search.toLowerCase()) && !a.code.toLowerCase().includes(filter.search.toLowerCase())) return false
-    if (filter.category && a.category !== filter.category) return false
+    if (activeCategory && a.category !== activeCategory) return false
     if (filter.status && a.status !== filter.status) return false
     if (filter.threatLevel === 'null') { if (a.threatLevel !== null) return false }
     else if (filter.threatLevel && a.threatLevel !== filter.threatLevel) return false

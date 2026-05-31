@@ -46,6 +46,8 @@ export default function CustomCursor({
   const styleRef = useRef<HTMLStyleElement | null>(null)
   const [devtoolsOpen, setDevtoolsOpen] = useState(false)
 
+
+  // DevTools detection — hides cursor when DevTools open. Preserves console.clear.
   useEffect(() => {
     const listener = (isOpen: boolean) => {
       setDevtoolsOpen(isOpen)

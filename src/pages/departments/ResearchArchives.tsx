@@ -52,7 +52,7 @@ export default function ResearchArchives() {
           <div className="max-w-6xl mx-auto">
             <div className="flex items-center gap-3 mb-6">
               <span className="text-[#60a5fa] text-xs tracking-widest" style={{ fontFamily: MONO }}>
-                [DEPT-10]
+                [DEPT-30]
               </span>
               <span className="text-[#666666]">/</span>
               <span className="text-[#888888] text-xs" style={{ fontFamily: MONO }}>
@@ -229,9 +229,9 @@ export default function ResearchArchives() {
               <div>
                 <h3 className="text-lg text-[#f0f0f0] font-bold mb-4">联系方式</h3>
                 <div className="space-y-2 text-sm text-[#888888]">
-                  <p>内部频道: DEPT-10-COM</p>
-                  <p>档案查询: 1000-10-0024</p>
-                  <p>研究中心: Site-01 / 档案与研究部大楼</p>
+                  <p>内部频道: DEPT-30-COM</p>
+                  <p>档案查询: 3000-30-0024</p>
+                  <p>研究中心: Site-3001 / 档案与研究部总部</p>
                 </div>
               </div>
             </div>

@@ -28,7 +28,7 @@ export default function Personnel() {
 
   return (
     <PageLayout
-      breadcrumbs={[{ label: 'PERSONNEL' }, { label: '人员档案' }]}
+      breadcrumbs={[{ label: '人员档案' }]}
       title="人员档案 / Personnel Database"
       subtitle={`边际结构组织在编人员档案。共计 ${total} 条记录，现役 ${active} 人，MIA ${mia} 人，阵亡 ${kia} 人。`}
     >

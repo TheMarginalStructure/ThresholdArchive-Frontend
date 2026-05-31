@@ -46,7 +46,7 @@ export default function MedicalPsychology() {
           <div className="max-w-6xl mx-auto">
             <div className="flex items-center gap-3 mb-6">
               <span className="text-[#4ade80] text-xs tracking-widest" style={{ fontFamily: MONO }}>
-                [DEPT-30]
+                [DEPT-40]
               </span>
               <span className="text-[#666666]">/</span>
               <span className="text-[#888888] text-xs" style={{ fontFamily: MONO }}>
@@ -222,9 +222,9 @@ export default function MedicalPsychology() {
               <div>
                 <h3 className="text-lg text-[#f0f0f0] font-bold mb-4">联系方式</h3>
                 <div className="space-y-2 text-sm text-[#888888]">
-                  <p>内部频道: DEPT-30-COM</p>
-                  <p>急救热线: 3000-30-0001</p>
-                  <p>医疗中心: Site-02 / 医疗与心理部大楼</p>
+                  <p>内部频道: DEPT-40-COM</p>
+                  <p>急救热线: 4000-40-0001</p>
+                  <p>医疗中心: Site-4001 / 医疗与心理部总部</p>
                 </div>
               </div>
             </div>

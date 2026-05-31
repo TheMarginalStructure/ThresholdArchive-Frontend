@@ -63,7 +63,7 @@ const CHANNELS = [
 export default function Contact() {
   return (
     <PageLayout
-      breadcrumbs={[{ label: 'OFFICIAL' }, { label: '联络终端' }]}
+      breadcrumbs={[{ label: '联络终端' }]}
       title="联络终端 / Contact"
       subtitle="官方对外通讯频道。由于安全协议限制，所有通讯均需通过审核。"
     >

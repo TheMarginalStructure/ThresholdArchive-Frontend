@@ -5,11 +5,11 @@ import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
 import 'katex/dist/katex.min.css'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, Radar, PolarGrid, PolarAngleAxis } from 'recharts'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import PageLayout from '../components/PageLayout'
 import { api, type ApiArchiveDetail } from '../lib/api'
 import { MONO, BODY } from '../utils/fonts'
-import { getCategoryColor } from '../data/archives'
+import { getCategoryColor, getCategoryCode } from '../data/archives'
 
 const chartTheme = {
   bar: '#d4a373',
@@ -87,7 +87,7 @@ export default function ArchiveDetail() {
   if (loading) {
     return (
       <PageLayout
-        breadcrumbs={[{ label: 'ARCHIVES', to: '/archives' }, { label: '加载中' }]}
+        breadcrumbs={[{ label: '档案库', to: '/archives' }, { label: '加载中' }]}
         title="加载中..."
         subtitle="正在从数据库获取档案数据"
         showBackButton
@@ -107,7 +107,7 @@ export default function ArchiveDetail() {
   if (error || !archive) {
     return (
       <PageLayout
-        breadcrumbs={[{ label: 'ARCHIVES', to: '/archives' }, { label: '未找到' }]}
+        breadcrumbs={[{ label: '档案库', to: '/archives' }, { label: '未找到' }]}
         title="档案不存在"
         subtitle="请求的档案编号在数据库中未找到。"
         showBackButton
@@ -141,7 +141,8 @@ export default function ArchiveDetail() {
   return (
     <PageLayout
       breadcrumbs={[
-        { label: 'ARCHIVES', to: '/archives' },
+        { label: '档案库', to: '/archives' },
+        { label: archive.category, to: '/archives/' + getCategoryCode(archive.category).toLowerCase() },
         { label: archive.code },
       ]}
       title={archive.title}
@@ -1015,9 +1016,10 @@ function ExplorationLogContent({ details }: { details: Record<string, unknown> }
           <div className="space-y-3 mb-4">
             {details.timeline.map((entry: Record<string, unknown>, i: number) => (
               <div key={i} className="border-l-2 border-[#d4a373]/30 pl-4">
-                <div className="text-xs text-[#d4a373] mb-1">{String(entry.time || '')}</div>
+                <div className="text-xs text-[#d4a373] mb-1">{String(entry.timestamp || entry.time || '')}</div>
                 <p className="text-xs text-[#888888] leading-relaxed">{String(entry.event || '')}</p>
-                {!!entry.notes && <p className="text-xs text-[#666666] mt-1">{String(entry.notes)}</p>}
+                {!!entry.status && <p className="text-xs text-[#d4a373] mt-1">{String(entry.status)}</p>}
+                {!!(entry.note || entry.notes) && <p className="text-xs text-[#666666] mt-1">备注: {String(entry.note || entry.notes || '')}</p>}
               </div>
             ))}
           </div>
@@ -1029,9 +1031,9 @@ function ExplorationLogContent({ details }: { details: Record<string, unknown> }
           <div className="space-y-3">
             {details.discoveries.map((discovery: Record<string, unknown>, i: number) => (
               <div key={i} className="border-b border-white/5 pb-2 last:border-0">
-                <div className="text-sm text-[#f0f0f0] font-medium mb-1">{String(discovery.title || '')}</div>
+                <div className="text-sm text-[#f0f0f0] font-medium mb-1">{String(discovery.type || discovery.title || '')}</div>
                 <p className="text-xs text-[#888888] leading-relaxed">{String(discovery.description || '')}</p>
-                {!!discovery.significance && <p className="text-xs text-[#d4a373] mt-1">重要性: {String(discovery.significance)}</p>}
+                {!!discovery.threatLevel && <p className="text-xs text-[#d4a373] mt-1">威胁等级: {String(discovery.threatLevel)}</p>}
               </div>
             ))}
           </div>
@@ -1411,19 +1413,29 @@ function PersonnelFileContent({ details: _details }: { details: Record<string, u
             </div>
           )}
 
-          {details.education && Array.isArray(details.education) && details.education.length > 0 && (
+          {details.education && (
             <div className="border border-white/10 p-5" style={{ background: 'rgba(17,17,17,0.6)' }}>
               <h2 className="text-xs text-[#d4a373] tracking-widest uppercase mb-4" style={{ fontFamily: MONO }}>EDUCATION / 教育背景</h2>
-              <div className="relative pl-4 border-l border-[#60a5fa]/30 space-y-4">
-                {details.education.map((edu: Record<string, unknown>, i: number) => (
-                  <div key={i} className="relative">
-                    <div className="absolute -left-[17px] top-1 w-2 h-2 rounded-full bg-[#60a5fa]" />
-                    <div className="text-xs text-[#666666] mb-0.5" style={{ fontFamily: MONO }}>{String(edu.period || '')}</div>
-                    <div className="text-sm text-[#f0f0f0] font-medium">{String(edu.institution || '')}</div>
-                    <div className="text-xs text-[#888888]">{String(edu.degree || '')}{edu.field ? ' · ' + String(edu.field) : ''}</div>
-                  </div>
-                ))}
-              </div>
+              {typeof details.education === 'string' ? (
+                <p className="text-sm text-[#888888] leading-relaxed">{String(details.education)}</p>
+              ) : Array.isArray(details.education) ? (
+                <div className="relative pl-4 border-l border-[#60a5fa]/30 space-y-4">
+                  {details.education.map((edu: Record<string, unknown>, i: number) => (
+                    <div key={i} className="relative">
+                      <div className="absolute -left-[17px] top-1 w-2 h-2 rounded-full bg-[#60a5fa]" />
+                      <div className="text-xs text-[#666666] mb-0.5" style={{ fontFamily: MONO }}>{String(edu.period || '')}</div>
+                      <div className="text-sm text-[#f0f0f0] font-medium">{String(edu.institution || '')}</div>
+                      <div className="text-xs text-[#888888]">{String(edu.degree || '')}{edu.field ? ' · ' + String(edu.field) : ''}</div>
+                    </div>
+                  ))}
+                </div>
+              ) : typeof details.education === 'object' && details.education !== null ? (
+                <div className="space-y-1 text-xs">
+                  {Object.entries(details.education as Record<string, unknown>).map(([k, v]) => (
+                    <div key={k}><span className="text-[#666666]">{formatKey(k)}：</span><span className="text-[#888888]">{String(v)}</span></div>
+                  ))}
+                </div>
+              ) : null}
             </div>
           )}
 
@@ -1632,7 +1644,16 @@ function MedicalReportContent({ details }: { details: Record<string, unknown> })
             ) : hasContent(details.executiveSummary) && (
               <div><span className="text-[#666666]">执行摘要：</span><span className="text-[#888888]">{String(details.executiveSummary)}</span></div>
             )}
-            {hasContent(details.mechanismAnalysis) && typeof details.mechanismAnalysis === 'object' && !Array.isArray(details.mechanismAnalysis) ? (
+            {hasContent(details.mechanismAnalysis) && Array.isArray(details.mechanismAnalysis) ? (
+              <div className="space-y-2 pl-2">
+                {(details.mechanismAnalysis as Record<string, unknown>[]).map((item: Record<string, unknown>, i: number) => (
+                  <div key={i} className="border-l-2 border-[#d4a373]/30 pl-3 py-1">
+                    {item.dimension && <div className="text-xs text-[#f0f0f0] mb-0.5">{String(item.dimension)}</div>}
+                    {item.description && <div className="text-xs text-[#888888]">{String(item.description)}</div>}
+                  </div>
+                ))}
+              </div>
+            ) : hasContent(details.mechanismAnalysis) && typeof details.mechanismAnalysis === 'object' && !Array.isArray(details.mechanismAnalysis) ? (
               <div>
                 <div className="text-[#666666] mb-1">机制分析：</div>
                 <div className="space-y-1 pl-2">
@@ -1677,28 +1698,18 @@ function MedicalReportContent({ details }: { details: Record<string, unknown> })
 
       {details.clinicalStages && Array.isArray(details.clinicalStages) && details.clinicalStages.length > 0 && (
         <Section title="临床阶段" code="STAGE">
-          <div className="mb-4">
-            <div className="h-36">
-              <ResponsiveContainer width="100%" height="100%">
-                <RadarChart data={details.clinicalStages.map((s: Record<string, unknown>) => ({
-                  name: String(s.name || '').substring(0, 4),
-                  severity: (String(s.duration || '').match(/\d+/)?.[0] || '0').length * 10,
-                }))}>
-                  <PolarGrid stroke="rgba(255,255,255,0.15)" />
-                  <PolarAngleAxis dataKey="name" tick={{ fill: '#cccccc', fontSize: 11 }} />
-                  <Radar name="severity" dataKey="severity" stroke="#d4a373" fill="#d4a373" fillOpacity={0.3} />
-                </RadarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
           <div className="space-y-4">
             {details.clinicalStages.map((stage: Record<string, unknown>, i: number) => (
-              <div key={i} className="border-l-2 border-[#d4a373]/30 pl-4">
-                <div className="text-xs text-[#d4a373] font-medium mb-1">{String(stage.name || '')}</div>
-                <p className="text-xs text-[#888888]"><span className="text-[#666666]">时长：</span>{String(stage.duration || '')}</p>
-                <p className="text-xs text-[#888888]"><span className="text-[#666666]">症状：</span>{String(stage.symptoms || '')}</p>
-                <p className="text-xs text-[#888888]"><span className="text-[#666666]">生理指标：</span>{String(stage.physicalIndicators || '')}</p>
-                <p className="text-xs text-[#888888]"><span className="text-[#666666]">心理指标：</span>{String(stage.psychologicalIndicators || '')}</p>
+              <div key={i} className="border border-white/10 rounded p-3">
+                <div className="text-[10px] text-[#d4a373] tracking-wider uppercase mb-2" style={{fontFamily:MONO}}>
+                  {String(stage.stage || stage.name || '')}
+                </div>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
+                  {stage.timeFeature && <div className="col-span-2"><span className="text-[#666666]">时间特征：</span><span className="text-[#888888]">{String(stage.timeFeature)}</span></div>}
+                  {stage.symptoms && <div className="col-span-2"><span className="text-[#666666]">症状表现：</span><span className="text-[#888888]">{String(stage.symptoms)}</span></div>}
+                  {stage.psychologicalImpact && <div><span className="text-[#666666]">心理影响：</span><span className="text-[#888888]">{String(stage.psychologicalImpact)}</span></div>}
+                  {stage.physiologicalBasis && <div><span className="text-[#666666]">生理基础：</span><span className="text-[#888888]">{String(stage.physiologicalBasis)}</span></div>}
+                </div>
               </div>
             ))}
           </div>
@@ -1877,7 +1888,7 @@ function ExperimentLogContent({ details }: { details: Record<string, unknown> })
                     name: String(r.item || r.test || '').substring(0, 6),
                     anomaly: String(r.anomalyLevel || '').length,
                   }))}
-                  margin={{ top: 5, right: 5, bottom: 5, left: 5 }}
+                  margin={{ top: 20, right: 10, bottom: 30, left: 40 }}
                 >
                   <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid} />
                   <XAxis dataKey="name" tick={{ fill: chartTheme.text, fontSize: 10 }} axisLine={false} tickLine={false} />
@@ -2090,16 +2101,22 @@ function TheoreticalDocumentContent({ details }: { details: Record<string, unkno
         </Section>
       )}
 
-      {details.caseReevaluation && Array.isArray(details.caseReevaluation) && details.caseReevaluation.length > 0 && (
+      {hasContent(details.caseReevaluation) && (
         <Section title="案例重评" code="CASE">
-          <div className="space-y-3">
-            {details.caseReevaluation.map((caseItem: Record<string, unknown>, i: number) => (
-              <div key={i} className="border-b border-white/5 pb-2 last:border-0">
-                <div className="text-sm text-[#f0f0f0] font-medium mb-1">{String(caseItem.case || '')}</div>
-                <p className="text-xs text-[#888888]">{String(caseItem.reevaluation || '')}</p>
-              </div>
-            ))}
-          </div>
+          {typeof details.caseReevaluation === 'string' ? (
+            <p className="text-sm text-[#888888] leading-relaxed whitespace-pre-wrap">{String(details.caseReevaluation)}</p>
+          ) : Array.isArray(details.caseReevaluation) ? (
+            <div className="space-y-3">
+              {details.caseReevaluation.map((caseItem: Record<string, unknown>, i: number) => (
+                <div key={i} className="border-b border-white/5 pb-2 last:border-0">
+                  <div className="text-sm text-[#f0f0f0] font-medium mb-1">{String(caseItem.case || '')}</div>
+                  <p className="text-xs text-[#888888]">{String(caseItem.reevaluation || '')}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-[#888888]">{String(details.caseReevaluation)}</p>
+          )}
         </Section>
       )}
 
@@ -2435,6 +2452,11 @@ function formatKey(key: string): string {
     behavior: '行为',
     dangerLevel: '危险等级',
     contactRecord: '接触记录',
+    background: '教育背景',
+    parameter: '参数',
+    specification: '规格',
+    thisEntity: '本实体/阈界',
+    otherEntity: '对照实体/阈界',
     category: '类别',
     scope_range: '范围',
     susceptibilityReason: '易感原因',

@@ -9,19 +9,19 @@ const SECURITY_STATS = [
 ]
 
 const FACILITIES_STATUS = [
-  { name: 'Site-01 总部', level: '一级警戒', status: '正常', guards: 12, lastCheck: '2026-05-27 06:00' },
-  { name: 'Site-02 医疗中心', level: '二级警戒', status: '正常', guards: 8, lastCheck: '2026-05-27 06:00' },
-  { name: 'Site-03 外勤基地', level: '一级警戒', status: '正常', guards: 15, lastCheck: '2026-05-27 06:00' },
-  { name: 'Site-04 研究设施', level: '三级警戒', status: '正常', guards: 6, lastCheck: '2026-05-27 06:00' },
-  { name: 'Site-05 仓储中心', level: '二级警戒', status: '正常', guards: 4, lastCheck: '2026-05-27 06:00' },
-  { name: 'Site-07 观测站', level: '一级警戒', status: '维护中', guards: 3, lastCheck: '2026-05-26 18:00' },
+  { name: 'Site-5001 安全部总部', level: '一级警戒', status: '正常', guards: 12, lastCheck: '2026-05-27 06:00' },
+  { name: 'Site-4001 医疗中心', level: '二级警戒', status: '正常', guards: 8, lastCheck: '2026-05-27 06:00' },
+  { name: 'Site-2001 外勤基地', level: '一级警戒', status: '正常', guards: 15, lastCheck: '2026-05-27 06:00' },
+  { name: 'Site-3001 研究设施', level: '三级警戒', status: '正常', guards: 6, lastCheck: '2026-05-27 06:00' },
+  { name: 'Site-6001 仓储中心', level: '二级警戒', status: '正常', guards: 4, lastCheck: '2026-05-27 06:00' },
+  { name: 'Site-1001 观测站', level: '一级警戒', status: '维护中', guards: 3, lastCheck: '2026-05-26 18:00' },
 ]
 
 const SECURITY_LOG = [
-  { time: '2026-05-27 05:47', event: 'Site-03 例行巡逻完成', level: '信息', operator: '安保-047' },
-  { time: '2026-05-27 04:12', event: 'Site-01  perimeter 传感器自检通过', level: '信息', operator: '系统' },
-  { time: '2026-05-27 02:30', event: 'Site-07 设施故障警报', level: '警告', operator: '安保-031' },
-  { time: '2026-05-26 23:15', event: '不明身份人员接近 Site-05', level: '警告', operator: '安保-052' },
+  { time: '2026-05-27 05:47', event: 'Site-2001 例行巡逻完成', level: '信息', operator: '安保-047' },
+  { time: '2026-05-27 04:12', event: 'Site-5001 perimeter 传感器自检通过', level: '信息', operator: '系统' },
+  { time: '2026-05-27 02:30', event: 'Site-1001 设施故障警报', level: '警告', operator: '安保-031' },
+  { time: '2026-05-26 23:15', event: '不明身份人员接近 Site-6001', level: '警告', operator: '安保-052' },
   { time: '2026-05-26 20:00', event: '全设施夜间警戒启动', level: '信息', operator: '安保-001' },
 ]
 
@@ -49,7 +49,7 @@ export default function SecurityProtection() {
           <div className="max-w-6xl mx-auto">
             <div className="flex items-center gap-3 mb-6">
               <span className="text-[#facc15] text-xs tracking-widest" style={{ fontFamily: MONO }}>
-                [DEPT-40]
+                [DEPT-50]
               </span>
               <span className="text-[#666666]">/</span>
               <span className="text-[#888888] text-xs" style={{ fontFamily: MONO }}>
@@ -213,9 +213,9 @@ export default function SecurityProtection() {
               <div>
                 <h3 className="text-lg text-[#f0f0f0] font-bold mb-4">联系方式</h3>
                 <div className="space-y-2 text-sm text-[#888888]">
-                  <p>内部频道: DEPT-40-COM</p>
-                  <p>紧急安保: 4000-40-0001</p>
-                  <p>指挥中心: Site-01 / 安全与防护部大楼</p>
+                  <p>内部频道: DEPT-50-COM</p>
+                  <p>紧急安保: 5000-50-0001</p>
+                  <p>指挥中心: Site-5001 / 安全与防护部总部</p>
                 </div>
               </div>
             </div>

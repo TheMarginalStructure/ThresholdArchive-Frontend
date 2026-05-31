@@ -15,20 +15,20 @@ const OTHER_PERSONNEL = [
 
 const ACTIVE_TEAMS = [
   { name: '伽马队 (Gamma)', code: 'Γ-07', status: ' deployed', location: 'TMS-L0234 明知山', members: 8, leader: '米拉·陈' },
-  { name: '堡垒队 (Fortress)', code: 'Φ-02', status: ' standby', location: 'Site-03', members: 4, leader: '"堡垒"' },
+  { name: '堡垒队 (Fortress)', code: 'Φ-02', status: ' standby', location: 'Site-2001', members: 4, leader: '"堡垒"' },
   { name: '西格玛队 (Sigma)', code: 'Σ-04', status: ' deployed', location: 'TMS-O0881 万花筒殿', members: 4, leader: '奥利弗·王' },
   { name: '守护者队 (Guardians)', code: 'Ω-05', status: ' training', location: '训练设施B', members: 4, leader: '亚历克斯·诺瓦克' },
-  { name: '织梦者队 (Dreamweavers)', code: 'Ψ-01', status: ' standby', location: 'Site-01', members: 5, leader: '艾伦·凯' },
+  { name: '织梦者队 (Dreamweavers)', code: 'Ψ-01', status: ' standby', location: 'Site-5001', members: 5, leader: '艾伦·凯' },
   { name: '守夜人队 (Nightwatch)', code: 'N-03', status: ' deployed', location: 'TMS-T0112 静默车站', members: 4, leader: '丽萨·张' },
-  { name: '拾荒者队 (Scavengers)', code: 'S-06', status: ' standby', location: 'Site-05', members: 6, leader: '维克多·彼得罗夫' },
-  { name: '贝塔队 (Beta)', code: 'B-08', status: ' training', location: 'Site-03', members: 5, leader: '莉亚·沃克中尉' },
+  { name: '拾荒者队 (Scavengers)', code: 'S-06', status: ' standby', location: 'Site-6001', members: 6, leader: '维克多·彼得罗夫' },
+  { name: '贝塔队 (Beta)', code: 'B-08', status: ' training', location: 'Site-2001', members: 5, leader: '莉亚·沃克中尉' },
 ]
 
 const RECENT_OPS = [
   { date: '2026-05-24', type: '勘探', target: 'TMS-T0112 静默车站', team: '守夜人队', status: '进行中' },
   { date: '2026-05-22', type: '监控', target: 'TMS-O2847 否定之人', team: '堡垒队', status: '已完成' },
   { date: '2026-05-20', type: '勘探', target: 'TMS-L0735 深邃之海', team: '伽马队', status: '已完成' },
-  { date: '2026-05-18', type: '救援', target: 'Site-07 设施故障', team: '西格玛队', status: '已完成' },
+  { date: '2026-05-18', type: '救援', target: 'Site-1001 设施故障', team: '西格玛队', status: '已完成' },
 ]
 
 export default function FieldOperations() {
@@ -200,8 +200,8 @@ export default function FieldOperations() {
                 <h3 className="text-lg text-[#f0f0f0] font-bold mb-4">联系方式</h3>
                 <div className="space-y-2 text-sm text-[#888888]">
                   <p>内部频道: DEPT-20-COM</p>
-                  <p>紧急联络: 2000-21-0015</p>
-                  <p>指挥中心: Site-03 / 外勤行动部大楼</p>
+                  <p>紧急联络: 2000-20-0015</p>
+                  <p>指挥中心: Site-2001 / 外勤行动部总部</p>
                 </div>
               </div>
             </div>

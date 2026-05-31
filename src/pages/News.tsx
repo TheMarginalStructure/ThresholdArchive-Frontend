@@ -35,7 +35,7 @@ export default function News() {
 
   return (
     <PageLayout
-      breadcrumbs={[{ label: 'NEWS' }, { label: '最新通报' }]}
+      breadcrumbs={[{ label: '最新通报' }]}
       title="最新通报 / News"
       subtitle="阈界动态、组织新闻、协议修订。本库的信息发布中心，所有消息都是真的——除非标了待验证。"
     >

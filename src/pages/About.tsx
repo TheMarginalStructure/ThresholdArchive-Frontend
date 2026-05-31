@@ -74,7 +74,7 @@ const PERSONNEL_STATS = [
 export default function About() {
   return (
     <PageLayout
-      breadcrumbs={[{ label: 'OFFICIAL' }, { label: '关于组织' }]}
+      breadcrumbs={[{ label: '关于组织' }]}
       title="关于边际结构 / About TMS"
       subtitle="测绘黑暗，设立路标，而非征服。EST. [DATA REDACTED] · 非公募组织"
     >

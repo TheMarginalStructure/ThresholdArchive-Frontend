@@ -20,7 +20,7 @@ export default function Incidents() {
 
   return (
     <PageLayout
-      breadcrumbs={[{ label: 'COMMUNITY' }, { label: '事件通报' }]}
+      breadcrumbs={[{ label: '事件通报' }]}
       title="事件通报 / Incident Reports"
       subtitle="阈界异常事件的实时通报与经验共享。把能活下来的方法开源，记录不是成功学，是同事互相留下的生存参考。"
     >

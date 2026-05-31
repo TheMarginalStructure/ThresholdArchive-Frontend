@@ -94,10 +94,10 @@ export default function Header() {
               <div className="px-3 py-2 text-[10px] text-[#666666] uppercase tracking-widest border-b border-white/5" style={{ fontFamily: MONO }}>
                 选择部门
               </div>
-              {departments.map((dept) => (
+              {departments.filter(dept => DEPT_ROUTES[dept.name]).map((dept) => (
                 <Link
                   key={dept.code}
-                  to={DEPT_ROUTES[dept.name] || `/dept/${dept.code}`}
+                  to={DEPT_ROUTES[dept.name]}
                   onClick={() => setDropdownOpen(false)}
                   className="flex items-center gap-3 px-3 py-2.5 hover:bg-white/5 transition-colors"
                 >
