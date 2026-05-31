@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { Link, useParams, useNavigate } from 'react-router'
 import PageLayout from '../components/PageLayout'
 import CustomSelect from '../components/CustomSelect'
-import { api, type ApiArchive } from '../lib/api'
+import { api, type ApiArchive, type ApiCategory } from '../lib/api'
 import { MONO } from '../utils/fonts'
 
 const SORT_OPTIONS = [
@@ -14,46 +14,19 @@ const SORT_OPTIONS = [
 
 const LEVEL_ORDER = ['黑色', '红色', '琥珀色', '黄色', '绿色', '蓝色', '白色']
 
-const ARCHIVE_CATEGORIES: { category: string; code: string; description: string }[] = [
-  { category: '阈界档案', code: 'TMS', description: '对特定阈界、阈界内实体或异常物体的详细描述和分析' },
-  { category: '勘探记录', code: 'EXP', description: '记录对未知或部分未知阈界的勘探行动' },
-  { category: '事件报告', code: 'EVT', description: '记录阈界现象溢出到基准现实或组织内部发生的事故' },
-  { category: '事件通信', code: 'COM', description: '记录与阈界相关的通信记录和交互事件' },
-  { category: '人事档案', code: 'HR', description: '记录关键员工的背景、技能、心理评估和任务历史' },
-  { category: '医疗报告', code: 'MED', description: '记录阈界暴露人员的心理和生理健康评估' },
-  { category: '实验记录', code: 'EL', description: '记录对阈界物品或现象进行的测试' },
-  { category: '理论文件', code: 'THY', description: '分析员或研究员提出的关于阈界本质、起源、相互联系的理论模型' },
-  { category: '协议手册', code: 'PRT', description: '标准操作程序汇编' },
-]
-
-function getCategoryColor(category: string): string {
-  const colors: Record<string, string> = {
-    '阈界档案': '#e60012',
-    '勘探记录': '#d4a373',
-    '事件报告': '#ff6b6b',
-    '事件通信': '#ff6b6b',
-    '人事档案': '#4ade80',
-    '医疗报告': '#60a5fa',
-    '实验记录': '#a78bfa',
-    '理论文件': '#f472b6',
-    '协议手册': '#888888',
-  }
-  return colors[category] || '#888888'
+const CATEGORY_COLORS: Record<string, string> = {
+  '阈界档案': '#e60012',
+  '对象档案': '#e60012',
+  '勘探记录': '#d4a373',
+  '事件报告': '#ff6b6b',
+  '事件通信': '#ff6b6b',
+  '人事档案': '#4ade80',
+  '医疗报告': '#60a5fa',
+  '实验记录': '#a78bfa',
+  '理论文件': '#f472b6',
+  '协议手册': '#888888',
 }
 
-function getThreatLevelColor(colorName: string | null): string {
-  const colors: Record<string, string> = {
-    '白色': '#e0e0e0',
-    '蓝色': '#4a9eff',
-    '绿色': '#4ade80',
-    '黄色': '#facc15',
-    '琥珀色': '#f59e0b',
-    '橙色': '#f97316',
-    '红色': '#e60012',
-    '黑色': '#666666',
-  }
-  return colors[colorName || ''] || '#888888'
-}
 
 export default function Archives() {
   const { category: urlCategory } = useParams<{ category?: string }>()
@@ -64,16 +37,22 @@ export default function Archives() {
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [categories, setCategories] = useState<ApiCategory[]>([])
 
-  const [allArchives, setAllArchives] = useState<ApiArchive[]>([])
+  // 从后端获取类别列表
+  useEffect(() => {
+    api.archives.categories()
+      .then(setCategories)
+      .catch(() => {})
+  }, [])
 
   const activeCategory = useMemo(() => {
     if (!urlCategory) return '全部'
-    const matched = ARCHIVE_CATEGORIES.find(
+    const matched = categories.find(
       (c) => c.code.toLowerCase() === urlCategory.toLowerCase()
     )
     return matched ? matched.category : '全部'
-  }, [urlCategory])
+  }, [urlCategory, categories])
 
   useEffect(() => {
     setLoading(true)
@@ -93,17 +72,6 @@ export default function Archives() {
       .catch((err) => setError(err.message || '加载失败'))
       .finally(() => setLoading(false))
   }, [activeCategory, searchQuery])
-
-  // 始终获取全部档案用于分类计数
-  useEffect(() => {
-    const params: Record<string, string> = { limit: '1000', page: '1' }
-    if (searchQuery.trim()) {
-      params.search = searchQuery.trim()
-    }
-    api.archives.list(params)
-      .then((res) => setAllArchives(res.data))
-      .catch(() => { })
-  }, [searchQuery])
 
   const filteredArchives = useMemo(() => {
     const result = [...archives]
@@ -132,14 +100,6 @@ export default function Archives() {
     return result
   }, [archives, sortBy])
 
-  const categoryStats = useMemo(() => {
-    const stats: Record<string, number> = {}
-    allArchives.forEach((a) => {
-      stats[a.category] = (stats[a.category] || 0) + 1
-    })
-    return stats
-  }, [allArchives])
-
   return (
     <PageLayout
       breadcrumbs={[{ label: 'ARCHIVES' }, { label: '档案库' }]}
@@ -157,9 +117,9 @@ export default function Archives() {
               }`}
             data-cursor-hover
           >
-            全部 {allArchives.length}
+            全部 {total}
           </button>
-          {ARCHIVE_CATEGORIES.map((cat) => (
+          {categories.map((cat) => (
             <button
               key={cat.code}
               onClick={() => navigate(`/archives/${cat.code}`)}
@@ -169,7 +129,7 @@ export default function Archives() {
                 }`}
               data-cursor-hover
             >
-              {cat.category} {categoryStats[cat.category] || 0}
+              {cat.category} {cat.count}
             </button>
           ))}
         </div>
@@ -236,7 +196,7 @@ export default function Archives() {
 }
 
 function ArchiveListItem({ archive }: { archive: ApiArchive }) {
-  const categoryColor = getCategoryColor(archive.category)
+  const categoryColor = CATEGORY_COLORS[archive.category] || '#888888'
 
   return (
     <Link

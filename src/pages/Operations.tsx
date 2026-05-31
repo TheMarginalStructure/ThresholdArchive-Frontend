@@ -63,6 +63,7 @@ export default function Operations() {
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-[10px] text-[#d4a373]" style={{ fontFamily: MONO }}>{exp.code}</span>
                       <span className={`text-[10px] px-2 py-0.5 border ${exp.status === '活跃' ? 'text-[#4ade80] border-[#4ade80]/40' :
+                          exp.status === '归档' ? 'text-[#60a5fa] border-[#60a5fa]/40' :
                           exp.status === '封存' ? 'text-[#888888] border-white/10' :
                             'text-[#facc15] border-[#facc15]/40'
                         }`}>

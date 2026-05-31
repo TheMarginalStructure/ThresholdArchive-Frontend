@@ -7,7 +7,7 @@
 // 通用类型定义
 // --------------------------------------------
 
-export type ArchiveStatus = '在档' | '封存' | '销毁待定' | '已销毁'
+export type ArchiveStatus = '活跃' | '归档' | '封存' | '销毁待定' | '已销毁'
 
 export type ThreatLevel = '白色' | '蓝色' | '绿色' | '黄色' | '琥珀色' | '橙色' | '红色' | '黑色'
 
@@ -15,6 +15,7 @@ export type ThreatType = 'E' | 'P' | 'C' | 'T' | 'I' | 'O' | 'CP' | 'EC' | 'OBJ'
 
 export type ArchiveCategory =
   | '阈界档案'
+  | '对象档案'
   | '勘探记录'
   | '事件报告'
   | '事件通信'
@@ -536,6 +537,22 @@ export interface ProtocolManual extends ArchiveBase {
 }
 
 // --------------------------------------------
+// 对象档案 (Object Archive - OBJ)
+// --------------------------------------------
+
+export interface ObjectArchive extends ArchiveBase {
+  category: '对象档案'
+  objectType?: string
+  sourceThreshold?: string
+  properties?: { name: string; description: string }[]
+  threatAssessment?: string
+  protocols?: { phase: string; procedureName: string; measures: string; department: string }[]
+  discoveryLocation?: string
+  anomalyReport?: string
+  responseTeam?: string
+}
+
+// --------------------------------------------
 // 联合类型
 // --------------------------------------------
 
@@ -547,6 +564,7 @@ export type Archive =
   | MedicalReport
   | ExperimentLog
   | TheoreticalDocument
+  | ObjectArchive
   | CommunicationTranscript
   | ProtocolManual
 
@@ -557,6 +575,7 @@ export type Archive =
 export function getCategoryColor(category: ArchiveCategory): string {
   const colors: Record<ArchiveCategory, string> = {
     '阈界档案': '#e60012',
+    '对象档案': '#e60012',
     '勘探记录': '#d4a373',
     '事件报告': '#ff6b6b',
     '事件通信': '#ff6b6b',
@@ -572,6 +591,7 @@ export function getCategoryColor(category: ArchiveCategory): string {
 export function getCategoryCode(category: ArchiveCategory): string {
   const codes: Record<ArchiveCategory, string> = {
     '阈界档案': 'TMS',
+    '对象档案': 'OBJ',
     '勘探记录': 'EXP',
     '事件报告': 'EVT',
     '事件通信': 'COM',

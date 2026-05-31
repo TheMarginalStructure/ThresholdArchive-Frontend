@@ -201,10 +201,17 @@ export interface CmsStats {
   announcements: number
 }
 
+export interface ApiCategory {
+  category: string
+  code: string
+  count: number
+}
+
 export const api = {
   archives: {
     list: (params?: Record<string, string | number>) =>
       fetchJson<ListResponse<ApiArchive>>(`${API_BASE}/archives?${new URLSearchParams(params as Record<string, string>)}`),
+    categories: () => fetchJson<ApiCategory[]>(`${API_BASE}/archives/categories`),
     get: (id: number) => fetchJson<ApiArchiveDetail>(`${API_BASE}/archives/${id}`),
     create: (data: Record<string, unknown>) =>
       fetchJson<ApiArchive>(`${API_BASE}/archives`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }),

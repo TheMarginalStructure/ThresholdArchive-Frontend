@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import MDEditor from '@uiw/react-md-editor'
 import CMSLayout from '../../components/CMSLayout'
@@ -24,7 +24,7 @@ export default function CMSArchiveForm() {
   const [personnel, setPersonnel] = useState<any[]>([])
   const [form, setForm] = useState({
     code: '', category: '阈界档案', title: '', status: '封存',
-    threatLevel: '', threatLevelColor: '', accessLevel: '',
+    threatLevel: '', threatLevelColor: '', accessLevel: '', sourceThreshold: '',
     description: '', mainDangers: '', details: '',
     finalReview: '', reviewStatus: 'approved', remarks: '',
     attachmentText: '',
@@ -37,6 +37,90 @@ export default function CMSArchiveForm() {
   const [dragging, setDragging] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [templates, setTemplates] = useState<any[]>([])
+  const [showCreateDialog, setShowCreateDialog] = useState(!isEdit)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const handleImportFile = async (file: File) => {
+    try {
+      const text = await file.text()
+      const json = JSON.parse(text)
+      const items = Array.isArray(json) ? json : [json]
+      if (items.length === 0) return
+      const data = items[0]
+      const findDeptId = (name: string) => {
+        if (!name) return ''
+        const dept = departments.find(d => name.includes(d.name) || d.name.includes(name))
+        return dept ? String(dept.id) : ''
+      }
+      const findPersonId = (name: string) => {
+        if (!name) return ''
+        const p = personnel.find(p => name.includes(p.name) || p.name.includes(name))
+        return p ? String(p.id) : ''
+      }
+      const dangers = Array.isArray(data.mainDangers) ? data.mainDangers.join(', ') : (data.mainDangers || '')
+      const detailFields: Record<string, unknown> = {}
+      const detailKeys = [
+        'missionCode','targetThreshold','team','teamLeader','explorationDate','missionStatus',
+        'missionOverview','teamMembers','equipment','timeline','discoveries','analysis',
+        'lessons','safetyRecommendations','followUpActions','incidentNature',
+        'symptomCharacteristics','confirmedCause','transmissionMechanism','events',
+        'responseMeasures','currentStatus','communicationType','communicationTime','channel',
+        'mainParties','purpose','entries','keyEvents','suggestedMeasures',
+        'personnelInfo','education','workExperience','skills','qualifications',
+        'performanceRecords','trainingRecords','evaluations','careerSuggestions',
+        'specialNotes','archiveChanges','accessRecords','executiveSummary',
+        'mechanismAnalysis','coreHazards','clinicalStages','treatmentDifficulties',
+        'treatmentPlans','recommendations','experimentDate','leadDepartment',
+        'experimentLead','dataSource','contentScope','experimentPurpose','experimentType',
+        'safetyLevel','objectives','objectDescription','knownCharacteristics','environment',
+        'testResults','experimentRounds','observations','riskAssessments',
+        'safetyRequirements','recommendedMeasures','conclusions','threatLevelAssessment',
+        'followUpSuggestions','abstract','introduction','coreConcept','theoryComponents',
+        'phases','comparisonAnalysis','caseReevaluation','personnelScreening',
+        'equipmentProtocols','ultimateStrategy','hypothesisVerifications','appendixFiles',
+        'archiveNature','coreFeatures','properties','environmentFeatures','knownEntities',
+        'discoveryLocation','anomalyReport','responseTeam','threatAssessments',
+        'comparisonThreats','protocols','accessRequirements','emergencyProcedures',
+        'behaviorGuidelines','commonName','sourceThreshold','objectType',
+        'version','effectiveDate','scope','sections',
+        'relatedArchives','signatures',
+      ]
+      detailKeys.forEach(k => { if (data[k] !== undefined) detailFields[k] = data[k] })
+      if (data.sourceDepartment) detailFields.sourceDepartment = data.sourceDepartment
+      if (data.responsibleDepartment) detailFields.responsibleDepartment = data.responsibleDepartment
+      if (data.leadPerson) detailFields.leadPerson = data.leadPerson
+      setForm({
+        code: data.code || '',
+        category: data.category || '阈界档案',
+        title: data.title || '',
+        status: data.status || '活跃',
+        threatLevel: data.threatLevel || '',
+        threatLevelColor: data.threatLevelColor || '',
+        accessLevel: data.accessLevel || '',
+        sourceThreshold: data.sourceThreshold || (data.details as any)?.sourceThreshold || '',
+        description: data.description || '',
+        mainDangers: dangers,
+        details: JSON.stringify(detailFields, null, 2),
+        finalReview: data.finalReview || '',
+        reviewStatus: data.reviewStatus || 'approved',
+        remarks: data.remarks || '',
+        attachmentText: data.attachmentText || '',
+        sourceDepartmentId: findDeptId(data.sourceDepartment || (data.details as any)?.sourceDepartment),
+        responsibleDepartmentId: findDeptId(data.responsibleDepartment || (data.details as any)?.responsibleDepartment),
+        leadPersonId: findPersonId(data.leadPerson || (data.details as any)?.leadPerson),
+        signatures: [],
+        customTemplate: '',
+        useCustomTemplate: false,
+      })
+      if (data.image) setImagePath(data.image)
+      if (data.video) setVideoPath(data.video)
+      setShowCreateDialog(false)
+    } catch (e) {
+      console.error('导入失败:', e)
+      alert('导入失败: ' + (e as Error).message)
+    }
+  }
+
   const [previewMedia, setPreviewMedia] = useState<string | null>(null)
   const [previewType, setPreviewType] = useState<'image' | 'video'>('image')
 
@@ -73,6 +157,7 @@ export default function CMSArchiveForm() {
             code: data.code || '', category: data.category || '阈界档案',
             title: data.title || '', status: data.status || '封存',
             threatLevel: data.threatLevel || '', threatLevelColor: data.threatLevelColor || '',
+            sourceThreshold: data.details?.sourceThreshold || '',
             accessLevel: data.accessLevel || '', description: data.description || '',
             mainDangers: data.mainDangers || '', details: data.details ? (typeof data.details === 'string' ? data.details : JSON.stringify(data.details, null, 2)) : '',
             finalReview: data.finalReview || '', reviewStatus: data.reviewStatus || 'approved',
@@ -139,7 +224,7 @@ export default function CMSArchiveForm() {
         ...form,
         imagePath,
         videoPath,
-        details: parsedDetails,
+        details: { ...parsedDetails, sourceThreshold: form.sourceThreshold || undefined },
         sourceDepartmentId: form.sourceDepartmentId || null,
         responsibleDepartmentId: form.responsibleDepartmentId || null,
         leadPersonId: form.leadPersonId || null,
@@ -153,10 +238,54 @@ export default function CMSArchiveForm() {
     setSaving(false)
   }
 
-  if (loading) return <CMSLayout><div className="text-center py-20 text-[#888888]">加载中...</div></CMSLayout>
+  if (loading) return <CMSLayout>
+<div className="text-center py-20 text-[#888888]">加载中...</div></CMSLayout>
 
   return (
     <CMSLayout>
+      {/* 创建方式选择对话框 */}
+      {showCreateDialog && !isEdit && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center" onClick={() => navigate('/admin/archives')}>
+          <div className="bg-[#0c0c0c] border border-white/10 rounded p-8 max-w-md w-full mx-4" onClick={e => e.stopPropagation()}>
+            <h2 className="text-lg font-medium mb-2">选择创建方式</h2>
+            <p className="text-xs text-[#888888] mb-6">请选择档案的创建方式</p>
+            <div className="space-y-3">
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="w-full flex items-center gap-3 px-4 py-3 border border-white/10 rounded hover:bg-white/5 transition-colors text-left"
+              >
+                <span className="text-xl opacity-60">📄</span>
+                <div>
+                  <div className="text-sm text-[#f0f0f0]">从文件生成</div>
+                  <div className="text-[10px] text-[#888888]">读取结构化的JSON档案文件，自动填充编辑表单</div>
+                </div>
+              </button>
+              <button
+                onClick={() => setShowCreateDialog(false)}
+                className="w-full flex items-center gap-3 px-4 py-3 border border-white/10 rounded hover:bg-white/5 transition-colors text-left"
+              >
+                <span className="text-xl opacity-60">✏️</span>
+                <div>
+                  <div className="text-sm text-[#f0f0f0]">空白模板填写</div>
+                  <div className="text-[10px] text-[#888888]">从空白表单开始手动填写档案信息</div>
+                </div>
+              </button>
+            </div>
+            <button
+              onClick={() => navigate('/admin/archives')}
+              className="mt-6 text-xs text-[#888888] hover:text-[#d4a373] transition-colors"
+            >取消</button>
+          </div>
+        </div>
+      )}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".json"
+        className="hidden"
+        onChange={e => { if (e.target.files?.[0]) handleImportFile(e.target.files[0]); e.target.value = '' }}
+      />
+
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-xl font-medium">{isEdit ? '编辑档案' : '新建档案'}</h1>
@@ -183,10 +312,11 @@ export default function CMSArchiveForm() {
                 <label className="text-xs text-[#888888] block mb-1">类别</label>
                 <select value={form.category} onChange={e => handleChange('category', e.target.value)} className="w-full bg-white/5 border border-white/10 rounded px-3 py-2 text-xs focus:border-[#d4a373] focus:outline-none">
                   <option value="阈界档案">阈界档案</option>
+                  <option value="对象档案">对象档案</option>
                   <option value="勘探记录">勘探记录</option>
                   <option value="事件报告">事件报告</option>
                   <option value="实验记录">实验记录</option>
-                  <option value="医疗报告">医疗报告</option>
+                   <option value="医疗报告">医疗报告</option>
                   <option value="事件通信">事件通信</option>
                   <option value="协议手册">协议手册</option>
                   <option value="理论文件">理论文件</option>
@@ -211,13 +341,20 @@ export default function CMSArchiveForm() {
               <div>
                 <label className="text-xs text-[#888888] block mb-1">状态</label>
                 <select value={form.status} onChange={e => handleChange('status', e.target.value)} className="w-full bg-white/5 border border-white/10 rounded px-3 py-2 text-xs focus:border-[#d4a373] focus:outline-none">
-                  <option value="在档">在档</option>
+                  <option value="活跃">活跃</option>
+                  <option value="归档">归档</option>
                   <option value="封存">封存</option>
                   <option value="销毁待定">销毁待定</option>
                   <option value="已销毁">已销毁</option>
                 </select>
               </div>
             </div>
+            {form.category === '对象档案' && (
+              <div>
+                <label className="text-xs text-[#888888] block mb-1">来源阈界</label>
+                <input value={form.sourceThreshold} onChange={e => handleChange('sourceThreshold', e.target.value)} className="w-full bg-white/5 border border-white/10 rounded px-3 py-2 text-xs focus:border-[#d4a373] focus:outline-none" placeholder="TMS-L0234 / 明知山" />
+              </div>
+            )}
             <div>
               <label className="text-xs text-[#888888] block mb-1">概述</label>
               <textarea value={form.description} onChange={e => handleChange('description', e.target.value)} rows={3} className="w-full bg-white/5 border border-white/10 rounded px-3 py-2 text-xs focus:border-[#d4a373] focus:outline-none resize-none" />

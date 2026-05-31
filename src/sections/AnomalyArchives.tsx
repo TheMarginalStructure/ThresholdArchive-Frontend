@@ -1,21 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router'
 import { MONO, BODY } from '../utils/fonts'
+import { getThreatLevelColor } from '../data/archives'
 import { api, type ApiArchive } from '../lib/api'
-
-function getThreatLevelColor(colorName: string | null): string {
-  const colors: Record<string, string> = {
-    '白色': '#e0e0e0',
-    '蓝色': '#4a9eff',
-    '绿色': '#4ade80',
-    '黄色': '#facc15',
-    '琥珀色': '#f59e0b',
-    '橙色': '#f97316',
-    '红色': '#e60012',
-    '黑色': '#666666',
-  }
-  return colors[colorName || ''] || '#888888'
-}
 
 export default function AnomalyArchives() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -27,7 +14,7 @@ export default function AnomalyArchives() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    api.archives.list({ limit: '6', page: '1', status: '在档' })
+    api.archives.list({ limit: '6', page: '1', status: '活跃' })
       .then((res) => {
         setArchives(res.data)
         setTotal(res.meta.total)
@@ -215,14 +202,14 @@ export default function AnomalyArchives() {
               className="absolute left-0 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#0a0a0a]/90 border border-white/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
               data-cursor-hover
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#888888" strokeWidth="2"><path d="M15 18l-6-6 6-6"/></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#888888" strokeWidth="2"><path d="M15 18l-6-6 6-6" /></svg>
             </button>
             <button
               onClick={() => scrollRef.current?.scrollBy({ left: scrollRef.current.clientWidth, behavior: 'smooth' })}
               className="absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#0a0a0a]/90 border border-white/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
               data-cursor-hover
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#888888" strokeWidth="2"><path d="M9 18l6-6-6-6"/></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#888888" strokeWidth="2"><path d="M9 18l6-6-6-6" /></svg>
             </button>
           </div>
         )}

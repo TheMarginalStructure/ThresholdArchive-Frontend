@@ -16,6 +16,7 @@ import { EXPERIMENT_LOGS } from './experimentLogs'
 import { THEORETICAL_DOCUMENTS } from './theoreticalDocuments'
 import { COMMUNICATION_TRANSCRIPTS } from './communicationTranscripts'
 import { PROTOCOL_MANUALS } from './protocolManuals'
+import { OBJECT_ARCHIVES } from './objectArchives'
 
 // 所有档案的联合数组
 export const ALL_ARCHIVES: Archive[] = [
@@ -28,6 +29,7 @@ export const ALL_ARCHIVES: Archive[] = [
   ...THEORETICAL_DOCUMENTS,
   ...COMMUNICATION_TRANSCRIPTS,
   ...PROTOCOL_MANUALS,
+  ...OBJECT_ARCHIVES,
 ]
 
 // 按类别分组的档案
@@ -41,6 +43,7 @@ export const ARCHIVES_BY_CATEGORY: Record<ArchiveCategory, Archive[]> = {
   '实验记录': EXPERIMENT_LOGS,
   '理论文件': THEORETICAL_DOCUMENTS,
   '协议手册': PROTOCOL_MANUALS,
+  '对象档案': OBJECT_ARCHIVES,
 }
 
 // 标准化ID格式（去除特殊字符，转为小写）
@@ -121,5 +124,10 @@ export const ARCHIVE_CATEGORIES: { category: ArchiveCategory; code: string; desc
     category: '协议手册',
     code: 'PRT',
     description: '标准操作程序汇编',
+  },
+  {
+    category: '对象档案',
+    code: 'OBJ',
+    description: '记录阈界内具有独立研究价值的异常物品或重要实体',
   },
 ]

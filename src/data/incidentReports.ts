@@ -5,7 +5,7 @@ export const INCIDENT_REPORTS: IncidentReport[] = [
     id: 'EVT-P0990-INC',
     code: 'EVT-P0990-INC',
     title: '第73区大规模慢性失眠集群事件报告',
-    status: '在档',
+    status: '归档',
     threatLevel: '琥珀色-C',
     threatLevelColor: '琥珀色',
     archiveDate: '[数据删除]',

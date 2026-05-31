@@ -9,6 +9,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import PageLayout from '../components/PageLayout'
 import { api, type ApiArchiveDetail } from '../lib/api'
 import { MONO, BODY } from '../utils/fonts'
+import { getCategoryColor } from '../data/archives'
 
 const chartTheme = {
   bar: '#d4a373',
@@ -43,21 +44,6 @@ function hasContent(value: unknown): boolean {
   return true
 }
 
-function getCategoryColor(category: string): string {
-  const colors: Record<string, string> = {
-    '阈界档案': '#e60012',
-    '勘探记录': '#d4a373',
-    '勘探记录': '#d4a373',
-    '事件报告': '#ff6b6b',
-    '事件通信': '#ff6b6b',
-    '人事档案': '#4ade80',
-    '医疗报告': '#60a5fa',
-    '实验记录': '#a78bfa',
-    '理论文件': '#f472b6',
-    '协议手册': '#888888',
-  }
-  return colors[category] || '#888888'
-}
 
 export default function ArchiveDetail() {
   const { id } = useParams<{ id: string }>()
@@ -691,6 +677,8 @@ function TypedDetailsContent({ category, details }: { category: string; details:
       return <PersonnelFileContent details={details} />
     case '医疗报告':
       return <MedicalReportContent details={details} />
+    case '对象档案':
+      return <ObjectArchiveContent details={details} />
     case '实验记录':
       return <ExperimentLogContent details={details} />
     case '理论文件':
@@ -712,6 +700,9 @@ function ThreatFileContent({ details }: { details: Record<string, unknown> }) {
         <div className="border border-white/10 rounded p-3 mb-4">
           <div className="text-xs text-[#d4a373] mb-2 font-medium">档案概要</div>
           <div className="space-y-2 text-xs">
+            {hasContent(details.commonName) && (
+              <div><span className="text-[#666666]">通用名称：</span><span className="text-[#d4a373]">{String(details.commonName)}</span></div>
+            )}
             {hasContent(details.archiveNature) && (
               <div><span className="text-[#666666]">档案性质：</span><span className="text-[#888888]">{String(details.archiveNature)}</span></div>
             )}
@@ -826,24 +817,14 @@ function ThreatFileContent({ details }: { details: Record<string, unknown> }) {
         </Section>
       )}
 
-      {/* 发现地点 */}
-      {hasContent(details.discoveryLocation) && (
-        <Section title="发现地点" code="LOC">
-          <p className="text-sm text-[#888888] leading-relaxed">{String(details.discoveryLocation)}</p>
-        </Section>
-      )}
-
-      {/* 异常报告 */}
-      {hasContent(details.anomalyReport) && (
-        <Section title="异常报告" code="ANOM">
-          <p className="text-sm text-[#888888] leading-relaxed">{String(details.anomalyReport)}</p>
-        </Section>
-      )}
-
-      {/* 响应队伍 */}
-      {hasContent(details.responseTeam) && (
-        <Section title="响应队伍" code="TEAM">
-          <p className="text-sm text-[#888888] leading-relaxed">{String(details.responseTeam)}</p>
+      {/* 附加信息 — 合并发现地点/异常报告/响应队伍 */}
+      {(hasContent(details.discoveryLocation) || hasContent(details.anomalyReport) || hasContent(details.responseTeam)) && (
+        <Section title="附加信息" code="INFO">
+          <div className="space-y-2 text-xs">
+            {hasContent(details.discoveryLocation) && <div><span className="text-[#666666]">发现地点：</span><span className="text-[#888888]">{String(details.discoveryLocation)}</span></div>}
+            {hasContent(details.anomalyReport) && <div><span className="text-[#666666]">异常报告：</span><span className="text-[#888888]">{String(details.anomalyReport)}</span></div>}
+            {hasContent(details.responseTeam) && <div><span className="text-[#666666]">响应队伍：</span><span className="text-[#888888]">{String(details.responseTeam)}</span></div>}
+          </div>
         </Section>
       )}
 
@@ -909,59 +890,46 @@ function ThreatFileContent({ details }: { details: Record<string, unknown> }) {
         </Section>
       )}
 
-      {/* 访问要求 */}
-      {details.accessRequirements && Array.isArray(details.accessRequirements) && details.accessRequirements.length > 0 && (
-        <Section title="访问要求" code="ACCESS">
-          <div className="space-y-2">
-            {details.accessRequirements.map((req: Record<string, unknown>, i: number) => (
-              <div key={i} className="flex items-start gap-2">
-                <span className={`text-xs mt-0.5 ${req.allowed ? 'text-[#4ade80]' : 'text-[#e60012]'}`}>
-                  {req.allowed ? '✓' : '✗'}
-                </span>
-                <span className={`text-xs ${req.allowed ? 'text-[#888888]' : 'text-[#e60012]/70'}`}>
-                  {String(req.text || '')}
-                </span>
+      {/* 权限与行为准则 — 合并访问要求/应急程序/行为准则 */}
+      {(details.accessRequirements?.length || details.emergencyProcedures?.length || details.behaviorGuidelines?.length) ? (
+        <Section title="权限与行为准则" code="RULES">
+          <div className="space-y-4">
+            {details.accessRequirements?.length > 0 && (
+              <div>
+                <div className="text-[10px] text-[#666666] tracking-wider uppercase mb-2" style={{fontFamily:MONO}}>访问要求</div>
+                {details.accessRequirements.map((req: Record<string, unknown>, i: number) => (
+                  <div key={i} className="flex items-start gap-2 text-xs">
+                    <span className={`mt-0.5 ${req.allowed ? 'text-[#4ade80]' : 'text-[#e60012]'}`}>{req.allowed ? '✓' : '✗'}</span>
+                    <span className={`${req.allowed ? 'text-[#888888]' : 'text-[#e60012]/70'}`}>{String(req.text || '')}</span>
+                  </div>
+                ))}
               </div>
-            ))}
+            )}
+            {details.emergencyProcedures?.length > 0 && (
+              <div>
+                <div className="text-[10px] text-[#666666] tracking-wider uppercase mb-2" style={{fontFamily:MONO}}>应急程序</div>
+                {details.emergencyProcedures.map((proc: Record<string, unknown>, i: number) => (
+                  <div key={i} className="flex items-start gap-2 text-xs">
+                    <span className={`mt-0.5 ${proc.allowed ? 'text-[#4ade80]' : 'text-[#e60012]'}`}>{proc.allowed ? '✓' : '✗'}</span>
+                    <span className={`${proc.allowed ? 'text-[#888888]' : 'text-[#e60012]/70'}`}>{String(proc.text || '')}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            {details.behaviorGuidelines?.length > 0 && (
+              <div>
+                <div className="text-[10px] text-[#666666] tracking-wider uppercase mb-2" style={{fontFamily:MONO}}>行为准则</div>
+                {details.behaviorGuidelines.map((guide: Record<string, unknown>, i: number) => (
+                  <div key={i} className="flex items-start gap-2 text-xs">
+                    <span className={`mt-0.5 ${guide.allowed ? 'text-[#4ade80]' : 'text-[#e60012]'}`}>{guide.allowed ? '✓' : '✗'}</span>
+                    <span className={`${guide.allowed ? 'text-[#888888]' : 'text-[#e60012]/70'}`}>{String(guide.text || '')}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </Section>
-      )}
-
-      {/* 应急程序 */}
-      {details.emergencyProcedures && Array.isArray(details.emergencyProcedures) && details.emergencyProcedures.length > 0 && (
-        <Section title="应急程序" code="EMRG">
-          <div className="space-y-2">
-            {details.emergencyProcedures.map((proc: Record<string, unknown>, i: number) => (
-              <div key={i} className="flex items-start gap-2">
-                <span className={`text-xs mt-0.5 ${proc.allowed ? 'text-[#4ade80]' : 'text-[#e60012]'}`}>
-                  {proc.allowed ? '✓' : '✗'}
-                </span>
-                <span className={`text-xs ${proc.allowed ? 'text-[#888888]' : 'text-[#e60012]/70'}`}>
-                  {String(proc.text || '')}
-                </span>
-              </div>
-            ))}
-          </div>
-        </Section>
-      )}
-
-      {/* 行为准则 */}
-      {details.behaviorGuidelines && Array.isArray(details.behaviorGuidelines) && details.behaviorGuidelines.length > 0 && (
-        <Section title="行为准则" code="GUIDE">
-          <div className="space-y-2">
-            {details.behaviorGuidelines.map((guide: Record<string, unknown>, i: number) => (
-              <div key={i} className="flex items-start gap-2">
-                <span className={`text-xs mt-0.5 ${guide.allowed ? 'text-[#4ade80]' : 'text-[#e60012]'}`}>
-                  {guide.allowed ? '✓' : '✗'}
-                </span>
-                <span className={`text-xs ${guide.allowed ? 'text-[#888888]' : 'text-[#e60012]/70'}`}>
-                  {String(guide.text || '')}
-                </span>
-              </div>
-            ))}
-          </div>
-        </Section>
-      )}
+      ) : null}
     </>
   )
 }
@@ -1033,7 +1001,7 @@ function ExplorationLogContent({ details }: { details: Record<string, unknown> }
                 <span className="text-xs text-[#d4a373] mt-0.5">•</span>
                 <div>
                   <span className="text-xs text-[#f0f0f0]">{String(item.name || '')}</span>
-                  <span className="text-xs text-[#666666]"> ({String(item.quantity || '')})</span>
+                  {!!item.quantity && <span className="text-xs text-[#666666]"> ({String(item.quantity)})</span>}
                   {!!item.notes && <p className="text-xs text-[#888888]">{String(item.notes)}</p>}
                 </div>
               </div>
@@ -1225,25 +1193,6 @@ function IncidentReportContent({ details }: { details: Record<string, unknown> }
         </Section>
       )}
 
-      {details.timeline && Array.isArray(details.timeline) && details.timeline.length > 0 && (
-        <Section title="时间记录" code="TIME">
-          <div className="space-y-0">
-            {details.timeline.map((entry: Record<string, unknown>, i: number) => (
-              <div key={i} className="relative pl-6 pb-4 last:pb-0">
-                <div className="absolute left-[7px] top-1.5 w-1.5 h-1.5 rounded-full bg-[#e60012]" />
-                {i < (details.timeline as unknown[]).length - 1 && (
-                  <div className="absolute left-[9px] top-3 w-px h-full bg-[#e60012]/20" />
-                )}
-                <div className="text-xs text-[#e60012] mb-1">{String(entry.time || '')}</div>
-                <p className="text-xs text-[#888888] leading-relaxed">{String(entry.event || '')}</p>
-                {!!entry.location && <p className="text-xs text-[#666666] mt-0.5">地点: {String(entry.location)}</p>}
-                {!!entry.personnel && <p className="text-xs text-[#666666]">人员: {String(entry.personnel)}</p>}
-              </div>
-            ))}
-          </div>
-        </Section>
-      )}
-
       {details.events && Array.isArray(details.events) && details.events.length > 0 && (
         <Section title="事件记录" code="EVTS">
           <div className="space-y-0">
@@ -1291,11 +1240,7 @@ function IncidentReportContent({ details }: { details: Record<string, unknown> }
         </Section>
       )}
 
-      {hasContent(details.currentStatus) && (
-        <Section title="当前状态" code="CURR">
-          {renderStatus(details.currentStatus)}
-        </Section>
-      )}
+      {/* 当前状态已在事件概要中展示 */}
 
       {details.appendices && Array.isArray(details.appendices) && details.appendices.length > 0 && (
         <Section title="附录" code="APPX">
@@ -1432,6 +1377,20 @@ function PersonnelFileContent({ details: _details }: { details: Record<string, u
   const details = _details as any
   return (
     <div>
+      {details.personnelInfo && (
+        <div className="border border-white/10 p-5 mb-6" style={{ background: 'rgba(17,17,17,0.6)' }}>
+          <h2 className="text-xs text-[#d4a373] tracking-widest uppercase mb-4" style={{ fontFamily: MONO }}>INFO / 人员信息</h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-xs">
+            {details.personnelInfo.name && <div><span className="text-[#666666]">姓名：</span><span className="text-[#f0f0f0]">{String(details.personnelInfo.name)}</span></div>}
+            {details.personnelInfo.department && <div><span className="text-[#666666]">部门：</span><span className="text-[#888888]">{String(details.personnelInfo.department)}</span></div>}
+            {details.personnelInfo.position && <div><span className="text-[#666666]">职位：</span><span className="text-[#888888]">{String(details.personnelInfo.position)}</span></div>}
+            {details.personnelInfo.code && <div><span className="text-[#666666]">人员编码：</span><span className="text-[#888888]" style={{fontFamily:MONO}}>{String(details.personnelInfo.code)}</span></div>}
+            {details.personnelInfo.hireDate && <div><span className="text-[#666666]">入职日期：</span><span className="text-[#888888]">{String(details.personnelInfo.hireDate)}</span></div>}
+            {details.personnelInfo.lastUpdate && <div><span className="text-[#666666]">最后更新：</span><span className="text-[#888888]">{String(details.personnelInfo.lastUpdate)}</span></div>}
+          </div>
+        </div>
+      )}
+
       {/* ===== Header ===== */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
@@ -1608,10 +1567,41 @@ function PersonnelFileContent({ details: _details }: { details: Record<string, u
           </div>
         </div>
       )}
+
+      {details.accessRecords && Array.isArray(details.accessRecords) && details.accessRecords.length > 0 && (
+        <div className="border border-white/10 p-5 mt-4" style={{ background: 'rgba(17,17,17,0.6)' }}>
+          <h2 className="text-xs text-[#d4a373] tracking-widest uppercase mb-3" style={{ fontFamily: MONO }}>ACCESS / 访问记录</h2>
+          <div className="space-y-2">
+            {details.accessRecords.map((rec: Record<string, unknown>, i: number) => (
+              <div key={i} className="text-xs flex items-start gap-2">
+                <span className="text-[#d4a373] whitespace-nowrap" style={{ fontFamily: MONO }}>{String(rec.time || '')}</span>
+                <div>
+                  <span className="text-[#888888]">{String(rec.accessor || '')}</span>
+                  {rec.purpose && <span className="text-[#666666]"> · {String(rec.purpose)}</span>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {details.appendices && Array.isArray(details.appendices) && details.appendices.length > 0 && (
+        <div className="border border-white/10 p-5 mt-4" style={{ background: 'rgba(17,17,17,0.6)' }}>
+          <h2 className="text-xs text-[#d4a373] tracking-widest uppercase mb-3" style={{ fontFamily: MONO }}>APPENDICES / 附录</h2>
+          <div className="space-y-2">
+            {details.appendices.map((app: Record<string, unknown>, i: number) => (
+              <div key={i} className="text-xs">
+                {app.code && <div className="text-[10px] text-[#d4a373]" style={{fontFamily:MONO}}>{String(app.code)}</div>}
+                <div className="text-[#888888]">{String(app.content || app.type || '')}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
-// 医疗报告内容渲染
+
 function MedicalReportContent({ details }: { details: Record<string, unknown> }) {
   const hasDiagnosisInfo = details.executiveSummary || details.mechanismAnalysis
 
@@ -1621,7 +1611,16 @@ function MedicalReportContent({ details }: { details: Record<string, unknown> })
         <div className="border border-white/10 rounded p-3 mb-4">
           <div className="text-xs text-[#d4a373] mb-2 font-medium">诊断概要</div>
           <div className="space-y-2 text-xs">
-            {hasContent(details.executiveSummary) && typeof details.executiveSummary === 'object' && !Array.isArray(details.executiveSummary) ? (
+            {hasContent(details.executiveSummary) && Array.isArray(details.executiveSummary) ? (
+              <div className="space-y-2 pl-2">
+                {(details.executiveSummary as Record<string, unknown>[]).map((item: Record<string, unknown>, i: number) => (
+                  <div key={i} className="border-l-2 border-[#d4a373]/30 pl-3 py-1">
+                    {item.item && <div className="text-xs text-[#f0f0f0] mb-0.5">{String(item.item)}</div>}
+                    {item.conclusion && <div className="text-xs text-[#888888]">{String(item.conclusion)}</div>}
+                  </div>
+                ))}
+              </div>
+            ) : hasContent(details.executiveSummary) && typeof details.executiveSummary === 'object' && !Array.isArray(details.executiveSummary) ? (
               <div>
                 <div className="text-[#666666] mb-1">执行摘要：</div>
                 <div className="space-y-1 pl-2">
@@ -1906,10 +1905,15 @@ function ExperimentLogContent({ details }: { details: Record<string, unknown> })
         <Section title="实验轮次" code="ROUND">
           <div className="space-y-3">
             {details.experimentRounds.map((round: Record<string, unknown>, i: number) => (
-              <div key={i} className="border-l-2 border-[#d4a373]/30 pl-4">
-                <div className="text-xs text-[#d4a373] font-medium mb-1">{String(round.round || '')}</div>
-                <p className="text-xs text-[#888888]">{String(round.description || '')}</p>
-                {!!round.result && <p className="text-xs text-[#f0f0f0] mt-1">结果: {String(round.result)}</p>}
+              <div key={i} className="border border-white/10 rounded p-3">
+                <div className="text-xs text-[#d4a373] font-medium mb-2">{String(round.round || '')}</div>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
+                  {round.inducedEmotion && <div><span className="text-[#666666]">诱导情绪：</span><span className="text-[#888888]">{String(round.inducedEmotion)}</span></div>}
+                  {round.contactDuration && <div><span className="text-[#666666]">接触时长：</span><span className="text-[#888888]">{String(round.contactDuration)}</span></div>}
+                  {round.distance && <div><span className="text-[#666666]">距离：</span><span className="text-[#888888]">{String(round.distance)}</span></div>}
+                  {round.observedEffect && <div><span className="text-[#666666]">观察效果：</span><span className="text-[#888888]">{String(round.observedEffect)}</span></div>}
+                  {round.intensity && <div><span className="text-[#666666]">强度：</span><span className="text-[#888888]">{String(round.intensity)}</span></div>}
+                </div>
               </div>
             ))}
           </div>
@@ -2145,10 +2149,13 @@ function TheoreticalDocumentContent({ details }: { details: Record<string, unkno
         <Section title="假设验证" code="HYP">
           <div className="space-y-3">
             {details.hypothesisVerifications.map((hyp: Record<string, unknown>, i: number) => (
-              <div key={i} className="border-b border-white/5 pb-2 last:border-0">
-                <div className="text-sm text-[#f0f0f0] font-medium mb-1">{String(hyp.hypothesis || '')}</div>
-                <p className="text-xs text-[#888888]">{String(hyp.verification || '')}</p>
-                {!!hyp.result && <p className="text-xs text-[#d4a373] mt-1"> 结果: {String(hyp.result)}</p>}
+              <div key={i} className="border border-white/10 rounded p-3">
+                <div className="text-sm text-[#f0f0f0] font-medium mb-2">{String(hyp.hypothesis || '')}</div>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
+                  {hyp.status && <div><span className="text-[#666666]">状态：</span><span className="text-[#d4a373]">{String(hyp.status)}</span></div>}
+                  {hyp.evidence && <div className="col-span-2"><span className="text-[#666666]">证据：</span><span className="text-[#888888]">{String(hyp.evidence)}</span></div>}
+                  {hyp.confidence && <div><span className="text-[#666666]">置信度：</span><span className="text-[#888888]">{String(hyp.confidence)}</span></div>}
+                </div>
               </div>
             ))}
           </div>
@@ -2157,11 +2164,21 @@ function TheoreticalDocumentContent({ details }: { details: Record<string, unkno
 
       {details.appendixFiles && Array.isArray(details.appendixFiles) && details.appendixFiles.length > 0 && (
         <Section title="附录文件" code="APPX">
+          <ul className="space-y-1">
+            {details.appendixFiles.map((file: unknown, i: number) => (
+              <li key={i} className="text-xs text-[#888888]">• {typeof file === 'string' ? file : String((file as Record<string, unknown>).title || (file as Record<string, unknown>).code || '')}</li>
+            ))}
+          </ul>
+        </Section>
+      )}
+
+      {details.appendices && Array.isArray(details.appendices) && details.appendices.length > 0 && (
+        <Section title="附录" code="APPD">
           <div className="space-y-2">
-            {details.appendixFiles.map((file: Record<string, unknown>, i: number) => (
-              <div key={i} className="flex items-start gap-2">
-                <span className="text-xs text-[#d4a373] mt-0.5">{String(file.code || '')}</span>
-                <span className="text-xs text-[#888888]">{String(file.title || '')}</span>
+            {details.appendices.map((app: Record<string, unknown>, i: number) => (
+              <div key={i} className="border-l-2 border-[#d4a373]/30 pl-3 py-1">
+                {app.code && <div className="text-[10px] text-[#d4a373]" style={{fontFamily:MONO}}>{String(app.code)}</div>}
+                {app.title && <div className="text-xs text-[#888888]">{String(app.title)}</div>}
               </div>
             ))}
           </div>
@@ -2175,21 +2192,13 @@ function TheoreticalDocumentContent({ details }: { details: Record<string, unkno
 function ProtocolManualContent({ details }: { details: Record<string, unknown> }) {
   return (
     <>
-      {details.version && (
-        <Section title="版本" code="VER">
-          <p className="text-sm text-[#888888]">{String(details.version)}</p>
-        </Section>
-      )}
-
-      {details.effectiveDate && (
-        <Section title="生效日期" code="DATE">
-          <p className="text-sm text-[#888888]">{String(details.effectiveDate)}</p>
-        </Section>
-      )}
-
-      {details.scope && (
-        <Section title="适用范围" code="SCOPE">
-          <p className="text-sm text-[#888888]">{String(details.scope)}</p>
+      {(details.version || details.effectiveDate || details.scope) && (
+        <Section title="基本信息" code="INFO">
+          <div className="grid grid-cols-3 gap-4 text-xs">
+            {details.version && <div><span className="text-[#666666]">版本：</span><span className="text-[#888888]">{String(details.version)}</span></div>}
+            {details.effectiveDate && <div><span className="text-[#666666]">生效日期：</span><span className="text-[#888888]">{String(details.effectiveDate)}</span></div>}
+            {details.scope && <div className="col-span-3"><span className="text-[#666666]">适用范围：</span><span className="text-[#888888]">{String(details.scope)}</span></div>}
+          </div>
         </Section>
       )}
 
@@ -2208,6 +2217,42 @@ function ProtocolManualContent({ details }: { details: Record<string, unknown> }
                 ) : (
                   <div className="text-xs text-[#888888] leading-relaxed whitespace-pre-wrap">{String(section.content || '')}</div>
                 )}
+              </div>
+            ))}
+          </div>
+        </Section>
+      )}
+    </>
+  )
+}
+
+// 对象档案内容渲染
+function ObjectArchiveContent({ details }: { details: Record<string, unknown> }) {
+  return (
+    <>
+      {details.sourceThreshold && (
+        <Section title="来源阈界" code="SRC">
+          <p className="text-sm text-[#d4a373]">{String(details.sourceThreshold)}</p>
+        </Section>
+      )}
+      {details.objectType && (
+        <Section title="对象类型" code="TYPE">
+          <p className="text-sm text-[#888888]">{String(details.objectType)}</p>
+        </Section>
+      )}
+      {details.threatAssessment && (
+        <Section title="威胁评估" code="THREAT">
+          <p className="text-sm text-[#888888]">{String(details.threatAssessment)}</p>
+        </Section>
+      )}
+      {details.protocols && Array.isArray(details.protocols) && details.protocols.length > 0 && (
+        <Section title="应对协议" code="PROT">
+          <div className="space-y-2">
+            {details.protocols.map((p: Record<string, unknown>, i: number) => (
+              <div key={i} className="border border-white/10 rounded p-2">
+                <div className="text-xs text-[#f0f0f0] font-medium">{String(p.procedureName || p.phase || '')}</div>
+                <div className="text-xs text-[#888888] mt-1">{String(p.measures || '')}</div>
+                {p.department && <div className="text-[10px] text-[#666] mt-0.5">{String(p.department)}</div>}
               </div>
             ))}
           </div>
@@ -2281,6 +2326,8 @@ function formatKey(key: string): string {
     threatAssessment: '威胁评估',
     events: '事件记录',
     responseMeasures: '响应措施',
+    indicator: '指标',
+    assessment: '评估',
     currentStatus: '当前状态',
     appendices: '附录',
     personnelInfo: '人员信息',
@@ -2311,6 +2358,8 @@ function formatKey(key: string): string {
     experimentType: '实验类型',
     safetyLevel: '安全等级',
     objectives: '实验目标',
+    sourceThreshold: '来源阈界',
+    objectType: '对象类型',
     objectDescription: '对象描述',
     knownCharacteristics: '已知特征',
     environment: '实验环境',
@@ -2389,6 +2438,15 @@ function formatKey(key: string): string {
     category: '类别',
     scope_range: '范围',
     susceptibilityReason: '易感原因',
+    completionRate: '任务完成度',
+    personnelStatus: '人员状况',
+    dataRecoveryRate: '数据完整度',
+    coreMechanismConfirmed: '核心机制确认',
+    theoreticalResearch: '理论研究',
+    inducedEmotion: '诱导情绪',
+    contactDuration: '接触时长',
+    observedEffect: '观察效果',
+    quantity: '数量',
     recommendedAction: '建议行动',
     procedureName: '流程名称',
     department: '部门',

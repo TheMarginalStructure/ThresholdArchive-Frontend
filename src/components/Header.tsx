@@ -1,20 +1,36 @@
 import { useEffect, useState, useRef } from 'react'
 import { Link } from 'react-router'
 import { MONO } from '../utils/fonts'
+import { api, type ApiDepartment } from '../lib/api'
 
-const DEPARTMENTS = [
-  { id: 'field', name: '外勤行动部', code: 'DEPT-20', color: '#e60012' },
-  { id: 'research', name: '档案与研究部', code: 'DEPT-10', color: '#60a5fa' },
-  { id: 'medical', name: '医疗与心理部', code: 'DEPT-30', color: '#4ade80' },
-  { id: 'security', name: '安全与防护部', code: 'DEPT-40', color: '#facc15' },
-  { id: 'logistics', name: '后勤与架构部', code: 'DEPT-50', color: '#d4a373' },
-]
+const DEPT_COLORS: Record<string, string> = {
+  '外勤行动部': '#e60012',
+  '档案与研究部': '#60a5fa',
+  '医疗与心理部': '#4ade80',
+  '安全与防护部': '#facc15',
+  '后勤与架构部': '#d4a373',
+}
+
+const DEPT_ROUTES: Record<string, string> = {
+  '外勤行动部': '/dept/field',
+  '档案与研究部': '/dept/research',
+  '医疗与心理部': '/dept/medical',
+  '安全与防护部': '/dept/security',
+  '后勤与架构部': '/dept/logistics',
+}
 
 export default function Header() {
   const [onlineCount, setOnlineCount] = useState(8104231)
   const [latency, setLatency] = useState(0.042)
   const [dropdownOpen, setDropdownOpen] = useState(false)
+  const [departments, setDepartments] = useState<ApiDepartment[]>([])
   const dropdownRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    api.departments.list()
+      .then(setDepartments)
+      .catch(() => {})
+  }, [])
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -78,16 +94,16 @@ export default function Header() {
               <div className="px-3 py-2 text-[10px] text-[#666666] uppercase tracking-widest border-b border-white/5" style={{ fontFamily: MONO }}>
                 选择部门
               </div>
-              {DEPARTMENTS.map((dept) => (
+              {departments.map((dept) => (
                 <Link
-                  key={dept.id}
-                  to={`/dept/${dept.id}`}
+                  key={dept.code}
+                  to={DEPT_ROUTES[dept.name] || `/dept/${dept.code}`}
                   onClick={() => setDropdownOpen(false)}
                   className="flex items-center gap-3 px-3 py-2.5 hover:bg-white/5 transition-colors"
                 >
                   <span
                     className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-                    style={{ backgroundColor: dept.color }}
+                    style={{ backgroundColor: DEPT_COLORS[dept.name] || '#888888' }}
                   />
                   <div className="flex flex-col">
                     <span className="text-xs text-[#f0f0f0]">{dept.name}</span>
