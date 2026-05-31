@@ -43,10 +43,39 @@ export default function CMSArchiveForm() {
   const handleImportFile = async (file: File) => {
     try {
       const text = await file.text()
-      const json = JSON.parse(text)
+      let json: any
+      try {
+        json = JSON.parse(text)
+      } catch {
+        alert('JSON 格式错误：文件内容不是有效的 JSON 格式')
+        return
+      }
       const items = Array.isArray(json) ? json : [json]
-      if (items.length === 0) return
+      if (items.length === 0) {
+        alert('JSON 数据为空：文件中未包含任何档案数据')
+        return
+      }
       const data = items[0]
+
+      // === 字段验证 ===
+      const errors: string[] = []
+      if (!data.title && !data.code) {
+        errors.push('缺少必要字段：title（档案标题）或 code（档案编码）')
+      }
+      if (!data.category) {
+        errors.push('缺少字段：category（档案类别）')
+      }
+      if (data.status && !['活跃','归档','封存','销毁待定','已销毁'].includes(data.status)) {
+        errors.push('status 值无效：应为 活跃/归档/封存/销毁待定/已销毁，实际为 "' + data.status + '"')
+      }
+      if (data.code && !/^[A-Z0-9]{2,6}-[A-Z0-9][A-Z0-9-]+$/.test(data.code)) {
+        errors.push('code 格式异常：应类似 TMS-L0234 / EXP-O0881 / HR-400001，实际为 "' + data.code + '"')
+      }
+      if (errors.length > 0) {
+        alert('档案数据结构异常，无法导入：\n\n' + errors.join('\n') + '\n\n请使用标准的种子数据 JSON 格式（参考 backend/prisma/data/ 下的文件）')
+        return
+      }
+
       const findDeptId = (name: string) => {
         if (!name) return ''
         const dept = departments.find(d => name.includes(d.name) || d.name.includes(name))
@@ -117,100 +146,11 @@ export default function CMSArchiveForm() {
       setShowCreateDialog(false)
     } catch (e) {
       console.error('导入失败:', e)
-      alert('导入失败: ' + (e as Error).message)
+      alert('导入失败: ' + (e as Error).message + '
+
+请确保文件为正确的种子数据 JSON 格式')
     }
-  }
-
-  const [previewMedia, setPreviewMedia] = useState<string | null>(null)
-  const [previewType, setPreviewType] = useState<'image' | 'video'>('image')
-
-  const getImageUrl = (path: string) => {
-    if (!path) return ''
-    if (path.startsWith('http')) return path
-    const cleanPath = path.startsWith('/api/v1') ? path : `/api/v1${path}`
-    return `http://localhost:3001${cleanPath}`
-  }
-
-  useEffect(() => {
-    Promise.all([
-      api.departments.list(),
-      api.personnel.list(),
-    ]).then(([depts, pers]) => {
-      setDepartments(Array.isArray(depts) ? depts : [])
-      setPersonnel(Array.isArray(pers) ? pers : [])
-    }).catch(() => { })
-
-    fetch(`${API_BASE}/cms/templates`)
-      .then(r => r.json())
-      .then(data => setTemplates(Array.isArray(data) ? data : []))
-      .catch(() => { })
-  }, [])
-
-  useEffect(() => {
-    if (!isEdit) return
-    const load = async () => {
-      try {
-        const res = await fetch(`${API_BASE}/cms/archives/${id}`)
-        const data = await res.json()
-        if (data) {
-          setForm({
-            code: data.code || '', category: data.category || '阈界档案',
-            title: data.title || '', status: data.status || '封存',
-            threatLevel: data.threatLevel || '', threatLevelColor: data.threatLevelColor || '',
-            sourceThreshold: data.details?.sourceThreshold || '',
-            accessLevel: data.accessLevel || '', description: data.description || '',
-            mainDangers: data.mainDangers || '', details: data.details ? (typeof data.details === 'string' ? data.details : JSON.stringify(data.details, null, 2)) : '',
-            finalReview: data.finalReview || '', reviewStatus: data.reviewStatus || 'approved',
-            remarks: data.remarks || '', attachmentText: data.attachmentText || '',
-            sourceDepartmentId: data.sourceDepartmentId ? String(data.sourceDepartmentId) : '',
-            responsibleDepartmentId: data.responsibleDepartmentId ? String(data.responsibleDepartmentId) : '',
-            leadPersonId: data.leadPersonId ? String(data.leadPersonId) : '',
-            signatures: (data.signatures || []).map((sig: any) => ({
-              personnelId: sig.personnelId ? String(sig.personnelId) : '',
-              position: sig.position || '',
-              note: sig.note || '',
-              name: sig.personnel?.name || sig.name || '',
-              esigCode: sig.personnel?.esigCode || sig.esigCode || '',
-            })),
-            customTemplate: data.customTemplate || '',
-            useCustomTemplate: data.useCustomTemplate || false,
-          })
-          setImagePath(data.imagePath || '')
-          setVideoPath(data.videoPath || '')
-        }
-      } catch (e) { console.error(e) }
-      setLoading(false)
-    }
-    load()
-  }, [id, isEdit])
-
-  const handleChange = (field: string, value: string) => setForm(prev => ({ ...prev, [field]: value }))
-
-  const handleImageUpload = async (file: File) => {
-    setUploading(true)
-    try {
-      const formData = new FormData()
-      formData.append('image', file)
-      const res = await fetch(`${API_BASE}/upload`, { method: 'POST', body: formData })
-      const data = await res.json()
-      if (data.url) setImagePath(data.url)
-    } catch (e) { console.error(e) }
-    setUploading(false)
-  }
-
-  const handleVideoUpload = async (file: File) => {
-    setUploading(true)
-    try {
-      const formData = new FormData()
-      formData.append('video', file)
-      const res = await fetch(`${API_BASE}/upload/video`, { method: 'POST', body: formData })
-      const data = await res.json()
-      if (data.url) setVideoPath(data.url)
-    } catch (e) { console.error(e) }
-    setUploading(false)
-  }
-
-  const handleSave = async () => {
+  }  const handleSave = async () => {
     setSaving(true)
     try {
       let parsedDetails: Record<string, unknown> = {}
