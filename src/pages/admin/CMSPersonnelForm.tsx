@@ -44,7 +44,7 @@ export default function CMSPersonnelForm() {
           nameEn: data.nameEn || '',
           title: data.title || '',
           codename: data.codename || '',
-          departmentId: data.departmentId ? String(data.departmentId) : '',
+          departmentId: data.department?.id ? String(data.department.id) : data.departmentId ? String(data.departmentId) : '',
           position: data.position || '',
           status: data.status || '现役',
           specialty: data.specialty || '',
