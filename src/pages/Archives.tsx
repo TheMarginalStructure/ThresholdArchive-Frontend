@@ -41,6 +41,7 @@ export default function Archives() {
 
   // 从后端获取类别列表
   useEffect(() => {
+    const controller = new AbortController()
     api.archives.categories()
       .then(setCategories)
       .catch(() => {})
