@@ -244,6 +244,11 @@ function ArchiveListItem({ archive }: { archive: ApiArchive }) {
             <div className="flex items-center gap-4 flex-wrap">
               <span className="text-lg text-[#f0f0f0] font-medium">
                 {archive.title}
+                {archive.category === '协议手册' && (archive.details as any)?.version && (
+                  <span className="ml-2 text-[10px] text-[#888888] align-middle" style={{ fontFamily: 'monospace' }}>
+                    v{(archive.details as any).version}
+                  </span>
+                )}
               </span>
             </div>
             <div className="flex items-center gap-3">
