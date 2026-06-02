@@ -108,7 +108,7 @@ export default function Header() {
                   <div className="flex flex-col">
                     <span className="text-xs text-[#f0f0f0]">{dept.name}</span>
                     <span className="text-[10px] text-[#666666]" style={{ fontFamily: MONO }}>
-                      [{dept.code.replace('DEPT-', '')}]
+                      {dept.code}
                     </span>
                   </div>
                 </Link>
