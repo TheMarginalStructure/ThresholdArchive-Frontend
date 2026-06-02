@@ -246,7 +246,7 @@ function ArchiveListItem({ archive }: { archive: ApiArchive }) {
                 {archive.title}
                 {archive.category === '协议手册' && (archive.details as any)?.version && (
                   <span className="ml-2 text-[10px] text-[#888888] align-middle" style={{ fontFamily: 'monospace' }}>
-                    v{(archive.details as any).version}
+                    {(archive.details as any).version}
                   </span>
                 )}
               </span>
