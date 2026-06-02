@@ -32,6 +32,7 @@ const CMSReviewForm = lazy(() => import('./pages/admin/CMSReviewForm'))
 const CMSAnnouncementList = lazy(() => import('./pages/admin/CMSAnnouncementList'))
 const CMSAnnouncementForm = lazy(() => import('./pages/admin/CMSAnnouncementForm'))
 const CMSPersonnel = lazy(() => import('./pages/admin/CMSPersonnel'))
+const CMSPersonnelForm = lazy(() => import('./pages/admin/CMSPersonnelForm'))
 
 // 部门官网页面 - 懒加载
 const FieldOperations = lazy(() => import('./pages/departments/FieldOperations'))
@@ -107,6 +108,8 @@ export default function App() {
         <Route path="/admin/announcements/new" element={<Suspense fallback={<PageSkeleton />}><CMSAnnouncementForm /></Suspense>} />
         <Route path="/admin/announcements/:id" element={<Suspense fallback={<PageSkeleton />}><CMSAnnouncementForm /></Suspense>} />
         <Route path="/admin/personnel" element={<Suspense fallback={<PageSkeleton />}><CMSPersonnel /></Suspense>} />
+        <Route path="/admin/personnel/new" element={<Suspense fallback={<PageSkeleton />}><CMSPersonnelForm /></Suspense>} />
+        <Route path="/admin/personnel/:id" element={<Suspense fallback={<PageSkeleton />}><CMSPersonnelForm /></Suspense>} />
 
         {/* 前台页面 - 使用 FrontendLayout */}
         <Route element={<FrontendLayout />}>

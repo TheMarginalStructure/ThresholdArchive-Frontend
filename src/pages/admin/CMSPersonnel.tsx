@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router'
 import CMSLayout from '../../components/CMSLayout'
 import { api, type ApiPersonnel } from '../../lib/api'
 import { MONO } from '../../utils/fonts'
@@ -23,6 +24,13 @@ export default function CMSPersonnel() {
           <div>
             <h1 className="text-lg text-[#f0f0f0] font-bold">人事管理</h1>
             <p className="text-xs text-[#888888] mt-1">共 {personnel.length} 条记录</p>
+          <Link
+            to="/admin/personnel/new"
+            className="px-3 py-1.5 text-xs border border-[#4ade80]/40 text-[#4ade80] hover:bg-[#4ade80]/10 transition-colors"
+            style={{ fontFamily: MONO }}
+          >
+            + 新增
+          </Link>
           </div>
         </div>
 
@@ -51,6 +59,7 @@ export default function CMSPersonnel() {
                   <th className="text-left p-3 font-normal">状态</th>
                   <th className="text-left p-3 font-normal">权限等级</th>
                   <th className="text-left p-3 font-normal">ESIG</th>
+                  <th className="text-left p-3 font-normal w-20">操作</th>
                 </tr>
               </thead>
               <tbody>
@@ -74,6 +83,15 @@ export default function CMSPersonnel() {
                     </td>
                     <td className="p-3 text-[#888888]" style={{ fontFamily: MONO }}>{p.clearanceLevel}</td>
                     <td className="p-3 text-[#888888]" style={{ fontFamily: MONO }}>{p.esigCode || '-'}</td>
+                    <td className="p-3">
+                      <Link
+                        to={`/admin/personnel/${p.id}`}
+                        className="text-[10px] text-[#60a5fa] hover:text-[#60a5fa]/80 transition-colors"
+                        style={{ fontFamily: MONO }}
+                      >
+                        编辑
+                      </Link>
+                    </td>
                   </tr>
                 ))}
               </tbody>
