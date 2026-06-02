@@ -39,6 +39,7 @@ const NAV_ITEMS: NavItem[] = [
   { path: '/admin/equipment', label: '装备管理' },
   { path: '/admin/reviews', label: '评价管理' },
   { path: '/admin/announcements', label: '系统公告' },
+  { path: '/admin/personnel', label: '人事管理' },
 ]
 
 export default function CMSLayout({ children }: CMSLayoutProps) {
