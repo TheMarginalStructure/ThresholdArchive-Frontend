@@ -1,12 +1,6 @@
 import { useState, useEffect } from 'react'
+import { api, type ApiPersonnel } from '../../lib/api'
 import { MONO, BODY } from '../../utils/fonts'
-
-const LOGISTICS_STATS = [
-  { label: '在编人员', value: 67, unit: '人' },
-  { label: '设施总数', value: 12, unit: '处' },
-  { label: '物资储备', value: 89, unit: '%' },
-  { label: '本月采购', value: 127, unit: '项' },
-]
 
 const FACILITIES = [
   { name: 'Site-5001 安全部总部', type: '行政/研究', status: '正常运行', capacity: '120人', maintenance: '良好' },
@@ -35,12 +29,33 @@ const MAINTENANCE_SCHEDULE = [
 ]
 
 export default function LogisticsInfrastructure() {
+  const [personnel, setPersonnel] = useState<ApiPersonnel[]>([])
   const [time, setTime] = useState(new Date())
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000)
     return () => clearInterval(timer)
   }, [])
+
+  useEffect(() => {
+    // 后勤与架构部 (DEPT-50, id=6)
+    api.personnel.list({ departmentId: 6 })
+      .then(setPersonnel)
+      .catch(() => {})
+  }, [])
+
+  const logStaff = personnel.length || 67
+
+  const LOGISTICS_STATS = [
+    { label: '在编人员', value: logStaff, unit: '人' },
+    { label: '设施总数', value: FACILITIES.length, unit: '处' },
+    { label: '物资储备', value: 89, unit: '%' },
+    { label: '本月采购', value: 127, unit: '项' },
+  ]
+
+  const deptMinister = personnel.find(p => p.position?.includes('部长'))
+  const deptDeputy = personnel.find(p => p.position?.includes('副部长'))
+  const lockChief = personnel.find(p => p.codename === '锁匠' || p.name.includes('彼得罗夫'))
 
   return (
     <div className="min-h-[100dvh] bg-[#0a0a0a]" style={{ fontFamily: BODY }}>
@@ -221,15 +236,27 @@ export default function LogisticsInfrastructure() {
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
                     <span className="text-xs text-[#d4a373]" style={{ fontFamily: MONO }}>[部长]</span>
-                    <span className="text-sm text-[#f0f0f0]">彼得·安德森 (Peter Anderson) 部长</span>
+                    <span className="text-sm text-[#f0f0f0]">
+                      {deptMinister
+                        ? `${deptMinister.name}${deptMinister.nameEn ? ` (${deptMinister.nameEn})` : ''}${deptMinister.title ? ` ${deptMinister.title}` : ''}`
+                        : '彼得·安德森 (Peter Anderson) 部长'}
+                    </span>
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="text-xs text-[#facc15]" style={{ fontFamily: MONO }}>[副部长]</span>
-                    <span className="text-sm text-[#f0f0f0]">奥尔加·波波娃 (Olga Popova)</span>
+                    <span className="text-sm text-[#f0f0f0]">
+                      {deptDeputy
+                        ? `${deptDeputy.name}${deptDeputy.nameEn ? ` (${deptDeputy.nameEn})` : ''}`
+                        : '奥尔加·波波娃 (Olga Popova)'}
+                    </span>
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="text-xs text-[#4ade80]" style={{ fontFamily: MONO }}>[首席]</span>
-                    <span className="text-sm text-[#f0f0f0]">维克多·彼得罗夫/锁匠 (Victor Petrov) - 连接点技术专家</span>
+                    <span className="text-sm text-[#f0f0f0]">
+                      {lockChief
+                        ? `${lockChief.name}${lockChief.nameEn ? ` (${lockChief.nameEn})` : ''}${lockChief.title ? ` ${lockChief.title}` : ''} - 连接点技术专家`
+                        : '维克多·彼得罗夫/锁匠 (Victor Petrov) - 连接点技术专家'}
+                    </span>
                   </div>
                 </div>
               </div>

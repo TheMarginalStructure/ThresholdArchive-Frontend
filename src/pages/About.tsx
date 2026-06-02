@@ -1,77 +1,162 @@
+import { useState, useEffect } from 'react'
 import PageLayout from '../components/PageLayout'
+import { api, type ApiPersonnel, type ApiDepartment } from '../lib/api'
 import { MONO, BODY } from '../utils/fonts'
 
-const LEADERSHIP = [
-  { position: '总指挥', name: '伊利亚·彼得连科 (Ilya Petrenko) 总指挥', department: '最高指挥部', id: 'IPetrenko', note: '年近七十，以现实主义和决断力著称' },
-  { position: '副总指挥', name: '索菲亚·罗德里格斯 (Sofia Rodriguez) 副总指挥', department: '最高指挥部', id: 'SRodriguez', note: '负责日常运营和危机协调' },
-  { position: '科学顾问', name: '哈维尔·冈萨雷斯 (Javier Gonzalez) 博士', department: '最高指挥部', id: 'HGonzalez', note: '监督跨部门研究项目' },
-  { position: '安全顾问', name: '娜塔莉·李 (Natalie Li)', department: '最高指挥部', id: 'NLi', note: '评估组织整体威胁' },
-]
+type LeadershipMember = {
+  position: string
+  name: string
+  department: string
+  id: string
+  note: string
+}
 
-const COUNCIL_MEMBERS = [
-  { position: '外勤行动部部长', name: '亚历山大·科瓦尔 (Alexander Koval) 部长' },
-  { position: '档案与研究部部长', name: '陈维华 (Chen Weihua) 博士' },
-  { position: '医疗与心理部部长', name: '埃莉诺·肖 (Eleanor Shaw) 博士' },
-  { position: '后勤与架构部部长', name: '彼得·安德森 (Peter Anderson) 部长' },
-  { position: '安全与防护部部长', name: '维克多·科瓦列夫 (Victor Kovalev)/铁墙 部长' },
-]
+type CouncilMember = {
+  position: string
+  name: string
+}
 
-const DEPARTMENTS = [
-  {
-    id: 'DEPT-FIELD',
-    name: '外勤行动部',
-    head: '亚历山大·科瓦尔 部长',
-    staff: 32,
-    active: 31,
-    description: '负责阈界实体的勘探、收容与清理。下辖伽马队、堡垒队、西格玛队、守护者队、贝塔队、织梦者队、拾荒者队、守夜人队等专业勘探队伍。',
-    teams: ['伽马队', '堡垒队', '西格玛队', '守护者队', '贝塔队', '织梦者队', '拾荒者队', '守夜人队'],
-  },
-  {
-    id: 'DEPT-ARCHIVE',
-    name: '档案与研究部',
-    head: '陈维华 博士',
-    staff: 8,
-    active: 8,
-    description: '负责记录、分类、交叉引用所有来自阈界的数据。管理档案编码系统、威胁等级评定和知识管理体系。',
-    teams: ['档案员团队', '分析员团队', '研究员团队'],
-  },
-  {
-    id: 'DEPT-MED',
-    name: '医疗与心理部',
-    head: '埃莉诺·肖 博士',
-    staff: 7,
-    active: 7,
-    description: '治疗由阈界经历引发的PTSD、认知扭曲、模因感染等。提供生理医疗、心理评估与康复服务。',
-    teams: ['生理医疗团队', '心理评估与康复团队', '净化协议团队'],
-  },
-  {
-    id: 'DEPT-SEC',
-    name: '安全与防护部',
-    head: '维克多·科瓦列夫/铁墙 部长',
-    staff: 10,
-    active: 10,
-    description: '负责设施安全评估、威胁分析和防护措施制定。管理安全专员团队、防护技术团队和应急响应团队。',
-    teams: ['安全专员团队', '防护技术团队', '应急响应团队'],
-  },
-  {
-    id: 'DEPT-LOG',
-    name: '后勤与架构部',
-    head: '彼得·安德森 部长',
-    staff: 5,
-    active: 5,
-    description: '在稳定的阈界连接点建造前哨站、安全屋、隔离墙。"锁匠"小组负责研究、建立、维持或关闭连接点。',
-    teams: ['架构师团队', '后勤支援团队', '"锁匠"技术小组'],
-  },
-]
+type DepartmentInfo = {
+  id: string
+  name: string
+  head: string
+  staff: number
+  active: number
+  description: string
+  teams: string[]
+}
 
-const PERSONNEL_STATS = [
-  { label: '总人员数', value: '71', color: '#f0f0f0' },
-  { label: '现役人员', value: '70', color: '#4ade80' },
-  { label: '阵亡人员', value: '1', color: '#e60012' },
-  { label: '现役率', value: '98.6%', color: '#d4a373' },
-]
+function findPersonName(personnel: ApiPersonnel[], namePart: string): string {
+  const p = personnel.find(p => p.name.includes(namePart) || (p.nameEn && p.nameEn.includes(namePart)))
+  if (!p) return namePart
+  const en = p.nameEn ? ` (${p.nameEn})` : ''
+  const title = p.title ? ` ${p.title}` : ''
+  return `${p.name}${en}${title}`
+}
 
 export default function About() {
+  const [personnel, setPersonnel] = useState<ApiPersonnel[]>([])
+  const [depts, setDepts] = useState<ApiDepartment[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    Promise.all([
+      api.personnel.list({}),
+      api.departments.list(),
+    ]).then(([p, d]) => {
+      setPersonnel(p)
+      setDepts(d)
+    }).catch(() => {
+      // fallback: leave empty
+    }).finally(() => setLoading(false))
+  }, [])
+
+  // === 派生数据 ===
+  const total = personnel.length
+  const active = personnel.filter(p => p.status === '现役').length
+  const kia = personnel.filter(p => p.status === '阵亡').length
+  const mia = personnel.filter(p => p.status === 'MIA').length
+  const activeRate = total > 0 ? ((active / total) * 100).toFixed(1) + '%' : '0%'
+
+  const LEADERSHIP: LeadershipMember[] = [
+    { position: '总指挥', name: '伊利亚·彼得连科 (Ilya Petrenko) 总指挥', department: '最高指挥部', id: 'IPetrenko', note: '年近七十，以现实主义和决断力著称' },
+    { position: '副总指挥', name: '索菲亚·罗德里格斯 (Sofia Rodriguez) 副总指挥', department: '最高指挥部', id: 'SRodriguez', note: '负责日常运营和危机协调' },
+    { position: '科学顾问', name: '哈维尔·冈萨雷斯 (Javier Gonzalez) 博士', department: '最高指挥部', id: 'HGonzalez', note: '监督跨部门研究项目' },
+    { position: '安全顾问', name: '娜塔莉·李 (Natalie Li)', department: '最高指挥部', id: 'NLi', note: '评估组织整体威胁' },
+  ]
+
+  const COUNCIL_MEMBERS: CouncilMember[] = (() => {
+    const heads: [string, string][] = [
+      ['外勤行动部', '亚历山大·科瓦尔 (Alexander Koval) 部长'],
+      ['档案与研究部', '陈维华 (Chen Weihua) 博士'],
+      ['医疗与心理部', '埃莉诺·肖 (Eleanor Shaw) 博士'],
+      ['后勤与架构部', '彼得·安德森 (Peter Anderson) 部长'],
+      ['安全与防护部', '维克多·科瓦列夫 (Victor Kovalev)/铁墙 部长'],
+    ]
+    return heads.map(([pos, name]) => ({ position: `${pos}部长`, name }))
+  })()
+
+  const getDeptHead = (deptName: string): string => {
+    const dept = depts.find(d => d.name === deptName)
+    if (dept?.leader) return dept.leader.name
+    // fallback
+    const map: Record<string, string> = {
+      '最高指挥部': '伊利亚·彼得连科 总指挥',
+      '外勤行动部': '亚历山大·科瓦尔 部长',
+      '档案与研究部': '陈维华 博士',
+      '医疗与心理部': '埃莉诺·肖 博士',
+      '安全与防护部': '维克多·科瓦列夫/铁墙 部长',
+      '后勤与架构部': '彼得·安德森 部长',
+    }
+    return map[deptName] || ''
+  }
+
+  const getDeptStaff = (deptName: string): number => {
+    const dept = depts.find(d => d.name === deptName)
+    return dept?._count?.personnel ?? 0
+  }
+
+  const DEPARTMENTS: DepartmentInfo[] = [
+    {
+      id: 'DEPT-FIELD',
+      name: '外勤行动部',
+      head: getDeptHead('外勤行动部'),
+      staff: Math.max(getDeptStaff('外勤行动部'), 32),
+      active: Math.max(getDeptStaff('外勤行动部'), 31),
+      description: '负责阈界实体的勘探、收容与清理。下辖伽马队、堡垒队、西格玛队、守护者队、贝塔队、织梦者队、拾荒者队、守夜人队等专业勘探队伍。',
+      teams: ['伽马队', '堡垒队', '西格玛队', '守护者队', '贝塔队', '织梦者队', '拾荒者队', '守夜人队'],
+    },
+    {
+      id: 'DEPT-ARCHIVE',
+      name: '档案与研究部',
+      head: getDeptHead('档案与研究部'),
+      staff: Math.max(getDeptStaff('档案与研究部'), 8),
+      active: Math.max(getDeptStaff('档案与研究部'), 8),
+      description: '负责记录、分类、交叉引用所有来自阈界的数据。管理档案编码系统、威胁等级评定和知识管理体系。',
+      teams: ['档案员团队', '分析员团队', '研究员团队'],
+    },
+    {
+      id: 'DEPT-MED',
+      name: '医疗与心理部',
+      head: getDeptHead('医疗与心理部'),
+      staff: Math.max(getDeptStaff('医疗与心理部'), 7),
+      active: Math.max(getDeptStaff('医疗与心理部'), 7),
+      description: '治疗由阈界经历引发的PTSD、认知扭曲、模因感染等。提供生理医疗、心理评估与康复服务。',
+      teams: ['生理医疗团队', '心理评估与康复团队', '净化协议团队'],
+    },
+    {
+      id: 'DEPT-SEC',
+      name: '安全与防护部',
+      head: getDeptHead('安全与防护部'),
+      staff: Math.max(getDeptStaff('安全与防护部'), 10),
+      active: Math.max(getDeptStaff('安全与防护部'), 10),
+      description: '负责设施安全评估、威胁分析和防护措施制定。管理安全专员团队、防护技术团队和应急响应团队。',
+      teams: ['安全专员团队', '防护技术团队', '应急响应团队'],
+    },
+    {
+      id: 'DEPT-LOG',
+      name: '后勤与架构部',
+      head: getDeptHead('后勤与架构部'),
+      staff: Math.max(getDeptStaff('后勤与架构部'), 5),
+      active: Math.max(getDeptStaff('后勤与架构部'), 5),
+      description: '在稳定的阈界连接点建造前哨站、安全屋、隔离墙。"锁匠"小组负责研究、建立、维持或关闭连接点。',
+      teams: ['架构师团队', '后勤支援团队', '"锁匠"技术小组'],
+    },
+  ]
+
+  const DEPT_STATS = depts.length > 0 ? depts.map(d => ({
+    dept: d.name,
+    active: d._count?.personnel ?? 0,
+    total: d._count?.personnel ?? 0,
+  })) : [
+    { dept: '领导层', active: 9, total: 9 },
+    { dept: '外勤行动部', active: 31, total: 32 },
+    { dept: '档案与研究部', active: 8, total: 8 },
+    { dept: '医疗与心理部', active: 7, total: 7 },
+    { dept: '安全与防护部', active: 10, total: 10 },
+    { dept: '后勤与架构部', active: 5, total: 5 },
+  ]
+
   return (
     <PageLayout
       breadcrumbs={[{ label: '关于组织' }]}
@@ -112,14 +197,30 @@ export default function About() {
 
           {/* Personnel Stats */}
           <div className="grid grid-cols-2 gap-4">
-            {PERSONNEL_STATS.map((stat) => (
-              <div key={stat.label} className="border border-white/10 p-5" style={{ background: 'rgba(17, 17, 17, 0.6)' }}>
-                <div className="text-xs text-[#888888] mb-2">{stat.label}</div>
-                <div className="text-2xl font-bold" style={{ fontFamily: MONO, color: stat.color }}>
-                  {stat.value}
-                </div>
+            {loading ? (
+              <div className="col-span-2 flex items-center justify-center py-12 text-[#888888] text-xs" style={{ fontFamily: MONO }}>
+                加载中...
               </div>
-            ))}
+            ) : (
+              <>
+                <div className="border border-white/10 p-5" style={{ background: 'rgba(17, 17, 17, 0.6)' }}>
+                  <div className="text-xs text-[#888888] mb-2">总人员数</div>
+                  <div className="text-2xl font-bold" style={{ fontFamily: MONO, color: '#f0f0f0' }}>{total}</div>
+                </div>
+                <div className="border border-white/10 p-5" style={{ background: 'rgba(17, 17, 17, 0.6)' }}>
+                  <div className="text-xs text-[#888888] mb-2">现役人员</div>
+                  <div className="text-2xl font-bold" style={{ fontFamily: MONO, color: '#4ade80' }}>{active}</div>
+                </div>
+                <div className="border border-white/10 p-5" style={{ background: 'rgba(17, 17, 17, 0.6)' }}>
+                  <div className="text-xs text-[#888888] mb-2">阵亡人员</div>
+                  <div className="text-2xl font-bold" style={{ fontFamily: MONO, color: '#e60012' }}>{kia}</div>
+                </div>
+                <div className="border border-white/10 p-5" style={{ background: 'rgba(17, 17, 17, 0.6)' }}>
+                  <div className="text-xs text-[#888888] mb-2">现役率</div>
+                  <div className="text-2xl font-bold" style={{ fontFamily: MONO, color: '#d4a373' }}>{activeRate}</div>
+                </div>
+              </>
+            )}
           </div>
         </div>
 
@@ -250,21 +351,21 @@ export default function About() {
 │   │   ├── 科学顾问：哈维尔·冈萨雷斯博士
 │   │   └── 安全顾问：娜塔莉·李
 │   └── 理事会成员（各部门部长）
-├── 外勤行动部 (32人)
+├── 外勤行动部 (${getDeptStaff('外勤行动部') || 32}人)
 │   ├── 部长：亚历山大·科瓦尔部长
 │   ├── 首席勘探员："堡垒"
 │   └── 8支专业勘探队伍
-├── 档案与研究部 (8人)
+├── 档案与研究部 (${getDeptStaff('档案与研究部') || 8}人)
 │   ├── 部长：陈维华博士
 │   ├── 首席档案员：安雅·夏尔马
 │   └── 首席研究员：林知远博士
-├── 医疗与心理部 (7人)
+├── 医疗与心理部 (${getDeptStaff('医疗与心理部') || 7}人)
 │   ├── 部长：埃莉诺·肖博士
 │   └── 副部长：戴维·卡特博士
-├── 安全与防护部 (10人)
+├── 安全与防护部 (${getDeptStaff('安全与防护部') || 10}人)
 │   ├── 部长：维克多·科瓦列夫/铁墙部长
 │   └── 应急响应主管：马库斯·斯通/哨兵
-└── 后勤与架构部 (5人)
+└── 后勤与架构部 (${getDeptStaff('后勤与架构部') || 5}人)
     ├── 部长：彼得·安德森部长
     └── "锁匠"技术小组`}
             </pre>
@@ -285,21 +386,14 @@ export default function About() {
             <div className="border border-white/10 p-6" style={{ background: 'rgba(17, 17, 17, 0.6)' }}>
               <div className="text-xs text-[#888888] mb-4">按部门统计</div>
               <div className="space-y-3">
-                {[
-                  { dept: '领导层', active: 9, total: 9 },
-                  { dept: '外勤行动部', active: 31, total: 32 },
-                  { dept: '档案与研究部', active: 8, total: 8 },
-                  { dept: '医疗与心理部', active: 7, total: 7 },
-                  { dept: '安全与防护部', active: 10, total: 10 },
-                  { dept: '后勤与架构部', active: 5, total: 5 },
-                ].map((item) => (
+                {DEPT_STATS.map((item) => (
                   <div key={item.dept} className="flex items-center gap-4">
                     <div className="w-24 text-xs text-[#888888]">{item.dept}</div>
                     <div className="flex-1 h-2 bg-white/5 overflow-hidden">
                       <div
                         className="h-full"
                         style={{
-                          width: `${(item.active / item.total) * 100}%`,
+                          width: `${(item.active / Math.max(item.total, 1)) * 100}%`,
                           background: item.active === item.total ? '#4ade80' : '#e60012',
                         }}
                       />
@@ -317,9 +411,9 @@ export default function About() {
               <div className="text-xs text-[#888888] mb-4">按状态统计</div>
               <div className="grid grid-cols-3 gap-4">
                 {[
-                  { status: '现役', count: 70, percent: '98.6%', color: '#4ade80' },
-                  { status: '阵亡', count: 1, percent: '1.4%', color: '#e60012' },
-                  { status: 'MIA', count: 0, percent: '0.0%', color: '#888888' },
+                  { status: '现役', count: active, percent: activeRate, color: '#4ade80' },
+                  { status: '阵亡', count: kia, percent: total > 0 ? ((kia / total) * 100).toFixed(1) + '%' : '0.0%', color: '#e60012' },
+                  { status: 'MIA', count: mia, percent: total > 0 ? ((mia / total) * 100).toFixed(1) + '%' : '0.0%', color: '#888888' },
                 ].map((item) => (
                   <div key={item.status} className="text-center">
                     <div className="text-2xl font-bold" style={{ fontFamily: MONO, color: item.color }}>
@@ -339,7 +433,7 @@ export default function About() {
                   <div className="flex-1 h-2 bg-white/5">
                     <div className="h-full w-full bg-[#e60012]" />
                   </div>
-                  <div className="text-xs text-[#e60012]">1人</div>
+                  <div className="text-xs text-[#e60012]">{kia}人</div>
                 </div>
               </div>
             </div>

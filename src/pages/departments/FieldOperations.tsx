@@ -1,27 +1,16 @@
 import { useState, useEffect } from 'react'
+import { api, type ApiPersonnel } from '../../lib/api'
 import { MONO, BODY } from '../../utils/fonts'
 
-const FIELD_STATS = [
-  { label: '现役勘探队', value: 8, unit: '支' },
-  { label: '外勤人员', value: 34, unit: '人' },
-  { label: '进行中任务', value: 12, unit: '项' },
-  { label: '本月出勤', value: 156, unit: '人次' },
-]
-
-const OTHER_PERSONNEL = [
-  { name: '乔治·马丁 (George Martin)', role: '联络官', id: 'GMartin' },
-  { name: '玛丽亚·冈萨雷斯 (Maria Gonzalez)', role: '情报分析师', id: 'MGonzalez' },
-]
-
 const ACTIVE_TEAMS = [
-  { name: '伽马队 (Gamma)', code: 'Γ-07', status: ' deployed', location: 'TMS-L0234 明知山', members: 8, leader: '米拉·陈' },
-  { name: '堡垒队 (Fortress)', code: 'Φ-02', status: ' standby', location: 'Site-2001', members: 4, leader: '"堡垒"' },
-  { name: '西格玛队 (Sigma)', code: 'Σ-04', status: ' deployed', location: 'TMS-O0881 万花筒殿', members: 4, leader: '奥利弗·王' },
-  { name: '守护者队 (Guardians)', code: 'Ω-05', status: ' training', location: '训练设施B', members: 4, leader: '亚历克斯·诺瓦克' },
-  { name: '织梦者队 (Dreamweavers)', code: 'Ψ-01', status: ' standby', location: 'Site-5001', members: 5, leader: '艾伦·凯' },
-  { name: '守夜人队 (Nightwatch)', code: 'N-03', status: ' deployed', location: 'TMS-T0112 静默车站', members: 4, leader: '丽萨·张' },
-  { name: '拾荒者队 (Scavengers)', code: 'S-06', status: ' standby', location: 'Site-6001', members: 6, leader: '维克多·彼得罗夫' },
-  { name: '贝塔队 (Beta)', code: 'B-08', status: ' training', location: 'Site-2001', members: 5, leader: '莉亚·沃克中尉' },
+  { name: '伽马队 (Gamma)', code: 'Γ-07', status: ' deployed', location: 'TMS-L0234 明知山', members: 8, leaderId: '米拉·陈' },
+  { name: '堡垒队 (Fortress)', code: 'Φ-02', status: ' standby', location: 'Site-2001', members: 4, leaderId: '堡垒' },
+  { name: '西格玛队 (Sigma)', code: 'Σ-04', status: ' deployed', location: 'TMS-O0881 万花筒殿', members: 4, leaderId: '奥利弗·王' },
+  { name: '守护者队 (Guardians)', code: 'Ω-05', status: ' training', location: '训练设施B', members: 4, leaderId: '亚历克斯·诺瓦克' },
+  { name: '织梦者队 (Dreamweavers)', code: 'Ψ-01', status: ' standby', location: 'Site-5001', members: 5, leaderId: '艾伦·凯' },
+  { name: '守夜人队 (Nightwatch)', code: 'N-03', status: ' deployed', location: 'TMS-T0112 静默车站', members: 4, leaderId: '丽萨·张' },
+  { name: '拾荒者队 (Scavengers)', code: 'S-06', status: ' standby', location: 'Site-6001', members: 6, leaderId: '维克多·彼得罗夫' },
+  { name: '贝塔队 (Beta)', code: 'B-08', status: ' training', location: 'Site-2001', members: 5, leaderId: '莉亚·沃克' },
 ]
 
 const RECENT_OPS = [
@@ -31,13 +20,60 @@ const RECENT_OPS = [
   { date: '2026-05-18', type: '救援', target: 'Site-1001 设施故障', team: '西格玛队', status: '已完成' },
 ]
 
+function findPerson(personnel: ApiPersonnel[], keyword: string): ApiPersonnel | undefined {
+  return personnel.find(p =>
+    p.name.includes(keyword) ||
+    (p.codename && p.codename.includes(keyword)) ||
+    (p.nameEn && p.nameEn.toLowerCase().includes(keyword.toLowerCase()))
+  )
+}
+
+function formatPerson(p: ApiPersonnel | undefined, fallback: string): string {
+  if (!p) return fallback
+  const en = p.nameEn ? ` (${p.nameEn})` : ''
+  const title = p.title ? ` ${p.title}` : ''
+  return `${p.name}${en}${title}`
+}
+
 export default function FieldOperations() {
+  const [personnel, setPersonnel] = useState<ApiPersonnel[]>([])
+  const [loading, setLoading] = useState(true)
   const [time, setTime] = useState(new Date())
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000)
     return () => clearInterval(timer)
   }, [])
+
+  useEffect(() => {
+    api.personnel.list({ departmentId: 3 }) // DEPT-20 id=3
+      .then(setPersonnel)
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [])
+
+  const fieldStaff = personnel.length || 34
+  const activeTeams = ACTIVE_TEAMS.length
+  const monthlyOps = RECENT_OPS.filter(o => o.status === '进行中').length || 2
+
+  const FIELD_STATS = [
+    { label: '现役勘探队', value: activeTeams, unit: '支' },
+    { label: '外勤人员', value: fieldStaff, unit: '人' },
+    { label: '进行中任务', value: monthlyOps, unit: '项' },
+    { label: '本月出勤', value: 156, unit: '人次' },
+  ]
+
+  const deptLead = findPerson(personnel, '亚历山大·科瓦尔')
+  const deptDeputy = findPerson(personnel, '莉亚·沃克')
+  const chiefExplorer = findPerson(personnel, '堡垒')
+  const trainingChief = findPerson(personnel, '卡洛斯·桑切斯')
+
+  const otherPersonnelIds = ['乔治·马丁', '玛丽亚·冈萨雷斯']
+  const otherPersonnel = otherPersonnelIds.map(id => ({
+    p: findPerson(personnel, id),
+    role: id === '乔治·马丁' ? '联络官' : '情报分析师',
+    key: id === '乔治·马丁' ? 'GMartin' : 'MGonzalez',
+  }))
 
   return (
     <div className="min-h-[100dvh] bg-[#0a0a0a]" style={{ fontFamily: BODY }}>
@@ -100,32 +136,35 @@ export default function FieldOperations() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {ACTIVE_TEAMS.map((team) => (
-                <div key={team.code} className="border border-white/10 p-4 hover:border-[#e60012]/40 transition-colors">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs text-[#e60012]" style={{ fontFamily: MONO }}>
-                      {team.code}
-                    </span>
-                    <span className={`text-xs px-2 py-0.5 ${
-                      team.status.includes('deployed')
-                        ? 'text-[#e60012] border border-[#e60012]/40'
-                        : team.status.includes('standby')
-                        ? 'text-[#facc15] border border-[#facc15]/40'
-                        : 'text-[#4ade80] border border-[#4ade80]/40'
-                    }`}>
-                      {team.status.includes('deployed') ? '部署中' : team.status.includes('standby') ? '待命' : '训练中'}
-                    </span>
+              {ACTIVE_TEAMS.map((team) => {
+                const leader = findPerson(personnel, team.leaderId)
+                return (
+                  <div key={team.code} className="border border-white/10 p-4 hover:border-[#e60012]/40 transition-colors">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-xs text-[#e60012]" style={{ fontFamily: MONO }}>
+                        {team.code}
+                      </span>
+                      <span className={`text-xs px-2 py-0.5 ${
+                        team.status.includes('deployed')
+                          ? 'text-[#e60012] border border-[#e60012]/40'
+                          : team.status.includes('standby')
+                          ? 'text-[#facc15] border border-[#facc15]/40'
+                          : 'text-[#4ade80] border border-[#4ade80]/40'
+                      }`}>
+                        {team.status.includes('deployed') ? '部署中' : team.status.includes('standby') ? '待命' : '训练中'}
+                      </span>
+                    </div>
+                    <h3 className="text-sm text-[#f0f0f0] font-medium mb-1">{team.name}</h3>
+                    <p className="text-xs text-[#888888] mb-2">{team.location}</p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-[#888888]" style={{ fontFamily: MONO }}>
+                        队员 {team.members} 人
+                      </span>
+                      <span className="text-xs text-[#888888]">队长: {formatPerson(leader, team.leaderId)}</span>
+                    </div>
                   </div>
-                  <h3 className="text-sm text-[#f0f0f0] font-medium mb-1">{team.name}</h3>
-                  <p className="text-xs text-[#888888] mb-2">{team.location}</p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-[#888888]" style={{ fontFamily: MONO }}>
-                      队员 {team.members} 人
-                    </span>
-                    <span className="text-xs text-[#888888]">队长: {team.leader}</span>
-                  </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
         </section>
@@ -167,19 +206,19 @@ export default function FieldOperations() {
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
                     <span className="text-xs text-[#e60012]" style={{ fontFamily: MONO }}>[部长]</span>
-                    <span className="text-sm text-[#f0f0f0]">亚历山大·科瓦尔 (Alexander Koval) 部长</span>
+                    <span className="text-sm text-[#f0f0f0]">{formatPerson(deptLead, '亚历山大·科瓦尔 (Alexander Koval) 部长')}</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="text-xs text-[#facc15]" style={{ fontFamily: MONO }}>[副部长]</span>
-                    <span className="text-sm text-[#f0f0f0]">莉亚·沃克 (Leah Walker) 中尉</span>
+                    <span className="text-sm text-[#f0f0f0]">{formatPerson(deptDeputy, '莉亚·沃克 (Leah Walker) 中尉')}</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="text-xs text-[#4ade80]" style={{ fontFamily: MONO }}>[首席]</span>
-                    <span className="text-sm text-[#f0f0f0]">"堡垒" (Fortress) - 首席勘探员</span>
+                    <span className="text-sm text-[#f0f0f0]">{formatPerson(chiefExplorer, '"堡垒" (Fortress) - 首席勘探员')}</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="text-xs text-[#888888]" style={{ fontFamily: MONO }}>[训练主管]</span>
-                    <span className="text-sm text-[#f0f0f0]">卡洛斯·桑切斯 (Carlos Sanchez)</span>
+                    <span className="text-sm text-[#f0f0f0]">{formatPerson(trainingChief, '卡洛斯·桑切斯 (Carlos Sanchez)')}</span>
                   </div>
                 </div>
               </div>
@@ -187,10 +226,10 @@ export default function FieldOperations() {
               <div>
                 <h3 className="text-lg text-[#f0f0f0] font-bold mb-4">其他人员</h3>
                 <div className="space-y-3">
-                  {OTHER_PERSONNEL.map((p) => (
-                    <div key={p.id} className="flex items-center gap-3">
-                      <span className="text-xs text-[#888888]" style={{ fontFamily: MONO }}>[{p.role}]</span>
-                      <span className="text-sm text-[#f0f0f0]">{p.name}</span>
+                  {otherPersonnel.map(({ p, role, key }) => (
+                    <div key={key} className="flex items-center gap-3">
+                      <span className="text-xs text-[#888888]" style={{ fontFamily: MONO }}>[{role}]</span>
+                      <span className="text-sm text-[#f0f0f0]">{formatPerson(p, key === 'GMartin' ? '乔治·马丁 (George Martin)' : '玛丽亚·冈萨雷斯 (Maria Gonzalez)')}</span>
                     </div>
                   ))}
                 </div>

@@ -1,12 +1,6 @@
 import { useState, useEffect } from 'react'
+import { api, type ApiPersonnel } from '../../lib/api'
 import { MONO, BODY } from '../../utils/fonts'
-
-const SECURITY_STATS = [
-  { label: '安全人员', value: 56, unit: '人' },
-  { label: '设施警戒', value: 12, unit: '处' },
-  { label: '本月事件', value: 3, unit: '起' },
-  { label: '装备库存', value: 892, unit: '件' },
-]
 
 const FACILITIES_STATUS = [
   { name: 'Site-5001 安全部总部', level: '一级警戒', status: '正常', guards: 12, lastCheck: '2026-05-27 06:00' },
@@ -34,12 +28,33 @@ const EQUIPMENT_INVENTORY = [
 ]
 
 export default function SecurityProtection() {
+  const [personnel, setPersonnel] = useState<ApiPersonnel[]>([])
   const [time, setTime] = useState(new Date())
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000)
     return () => clearInterval(timer)
   }, [])
+
+  useEffect(() => {
+    // 安全与防护部 (DEPT-40, id=5)
+    api.personnel.list({ departmentId: 5 })
+      .then(setPersonnel)
+      .catch(() => {})
+  }, [])
+
+  const securityStaff = personnel.length || 56
+
+  const SECURITY_STATS = [
+    { label: '安全人员', value: securityStaff, unit: '人' },
+    { label: '设施警戒', value: FACILITIES_STATUS.length, unit: '处' },
+    { label: '本月事件', value: SECURITY_LOG.filter(l => l.level === '警告').length, unit: '起' },
+    { label: '装备库存', value: EQUIPMENT_INVENTORY.reduce((s, e) => s + e.count, 0), unit: '件' },
+  ]
+
+  const deptMinister = personnel.find(p => p.position?.includes('部长'))
+  const deptDeputy = personnel.find(p => p.position?.includes('副部长'))
+  const chiefResponder = personnel.find(p => p.name.includes('马库斯'))
 
   return (
     <div className="min-h-[100dvh] bg-[#0a0a0a]" style={{ fontFamily: BODY }}>
@@ -197,15 +212,27 @@ export default function SecurityProtection() {
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
                     <span className="text-xs text-[#facc15]" style={{ fontFamily: MONO }}>[部长]</span>
-                    <span className="text-sm text-[#f0f0f0]">维克多·科瓦列夫/铁墙 (Victor Kovalev) 部长</span>
+                    <span className="text-sm text-[#f0f0f0]">
+                      {deptMinister
+                        ? `${deptMinister.name}${deptMinister.nameEn ? ` (${deptMinister.nameEn})` : ''}${deptMinister.title ? ` ${deptMinister.title}` : ''}`
+                        : '维克多·科瓦列夫/铁墙 (Victor Kovalev) 部长'}
+                    </span>
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="text-xs text-[#facc15]" style={{ fontFamily: MONO }}>[副部长]</span>
-                    <span className="text-sm text-[#f0f0f0]">莎拉·布莱克伍德 (Sarah Blackwood)</span>
+                    <span className="text-sm text-[#f0f0f0]">
+                      {deptDeputy
+                        ? `${deptDeputy.name}${deptDeputy.nameEn ? ` (${deptDeputy.nameEn})` : ''}`
+                        : '莎拉·布莱克伍德 (Sarah Blackwood)'}
+                    </span>
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="text-xs text-[#4ade80]" style={{ fontFamily: MONO }}>[首席]</span>
-                    <span className="text-sm text-[#f0f0f0]">马库斯·斯通/哨兵 (Marcus Stone) - 应急响应主管</span>
+                    <span className="text-sm text-[#f0f0f0]">
+                      {chiefResponder
+                        ? `${chiefResponder.name}${chiefResponder.nameEn ? ` (${chiefResponder.nameEn})` : ''}${chiefResponder.title ? ` ${chiefResponder.title}` : ''} - 应急响应主管`
+                        : '马库斯·斯通/哨兵 (Marcus Stone) - 应急响应主管'}
+                    </span>
                   </div>
                 </div>
               </div>

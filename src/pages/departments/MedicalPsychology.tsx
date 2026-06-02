@@ -1,12 +1,6 @@
 import { useState, useEffect } from 'react'
+import { api, type ApiPersonnel } from '../../lib/api'
 import { MONO, BODY } from '../../utils/fonts'
-
-const MEDICAL_STATS = [
-  { label: '现役医护人员', value: 28, unit: '人' },
-  { label: '在院伤员', value: 7, unit: '人' },
-  { label: '心理评估待审', value: 15, unit: '例' },
-  { label: '本月救治', value: 43, unit: '人次' },
-]
 
 const ACTIVE_CASES = [
   { id: 'MED-2026-089', patient: '███ ████', type: '阈界暴露创伤', status: '治疗中', ward: '隔离病房A', days: 12 },
@@ -17,10 +11,10 @@ const ACTIVE_CASES = [
 ]
 
 const PSYCH_EVALS = [
-  { date: '2026-05-26', subject: '伽马队全体', type: '任务后评估', result: '通过', examiner: '詹姆斯·帕克博士' },
-  { date: '2026-05-24', subject: '堡垒队全体', type: '例行评估', result: '通过', examiner: '詹姆斯·帕克博士' },
-  { date: '2026-05-22', subject: '西格玛队全体', type: '任务后评估', result: '需复查', examiner: '詹姆斯·帕克博士' },
-  { date: '2026-05-20', subject: '新入职人员(3人)', type: '入职评估', result: '通过', examiner: '詹姆斯·帕克博士' },
+  { date: '2026-05-26', subject: '伽马队全体', type: '任务后评估', result: '通过', examinerId: '詹姆斯·帕克' },
+  { date: '2026-05-24', subject: '堡垒队全体', type: '例行评估', result: '通过', examinerId: '詹姆斯·帕克' },
+  { date: '2026-05-22', subject: '西格玛队全体', type: '任务后评估', result: '需复查', examinerId: '詹姆斯·帕克' },
+  { date: '2026-05-20', subject: '新入职人员(3人)', type: '入职评估', result: '通过', examinerId: '詹姆斯·帕克' },
 ]
 
 const RESOURCE_STATUS = [
@@ -31,12 +25,33 @@ const RESOURCE_STATUS = [
 ]
 
 export default function MedicalPsychology() {
+  const [personnel, setPersonnel] = useState<ApiPersonnel[]>([])
   const [time, setTime] = useState(new Date())
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000)
     return () => clearInterval(timer)
   }, [])
+
+  useEffect(() => {
+    // 获取医疗与心理部人员 (DEPT-30, id=4 based on seed order)
+    api.personnel.list({ departmentId: 4 })
+      .then(setPersonnel)
+      .catch(() => {})
+  }, [])
+
+  const medStaff = personnel.length || 28
+
+  const MEDICAL_STATS = [
+    { label: '现役医护人员', value: medStaff, unit: '人' },
+    { label: '在院伤员', value: ACTIVE_CASES.length, unit: '人' },
+    { label: '心理评估待审', value: PSYCH_EVALS.filter(e => e.result === '需复查').length + 10, unit: '例' },
+    { label: '本月救治', value: 43, unit: '人次' },
+  ]
+
+  const deptMinister = personnel.find(p => p.position?.includes('部长'))
+  const deptDeputy = personnel.find(p => p.position?.includes('副部长') || p.name.includes('戴维·卡特'))
+  const psychChief = personnel.find(p => p.name.includes('詹姆斯'))
 
   return (
     <div className="min-h-[100dvh] bg-[#0a0a0a]" style={{ fontFamily: BODY }}>
@@ -182,17 +197,23 @@ export default function MedicalPsychology() {
                 <span>结果</span>
                 <span>评估师</span>
               </div>
-              {PSYCH_EVALS.map((ev, i) => (
-                <div key={i} className="grid grid-cols-5 gap-4 p-3 border-b border-white/5 text-xs hover:bg-white/5 transition-colors">
-                  <span className="text-[#888888]" style={{ fontFamily: MONO }}>{ev.date}</span>
-                  <span className="text-[#f0f0f0]">{ev.subject}</span>
-                  <span className="text-[#888888]">{ev.type}</span>
-                  <span className={ev.result === '通过' ? 'text-[#4ade80]' : 'text-[#facc15]'}>
-                    {ev.result}
-                  </span>
-                  <span className="text-[#888888]">{ev.examiner}</span>
-                </div>
-              ))}
+              {PSYCH_EVALS.map((ev, i) => {
+                const examiner = personnel.find(p => p.name.includes(ev.examinerId))
+                const examinerName = examiner
+                  ? `${examiner.name}${examiner.title ? ` ${examiner.title}` : ''}`
+                  : `${ev.examinerId}博士`
+                return (
+                  <div key={i} className="grid grid-cols-5 gap-4 p-3 border-b border-white/5 text-xs hover:bg-white/5 transition-colors">
+                    <span className="text-[#888888]" style={{ fontFamily: MONO }}>{ev.date}</span>
+                    <span className="text-[#f0f0f0]">{ev.subject}</span>
+                    <span className="text-[#888888]">{ev.type}</span>
+                    <span className={ev.result === '通过' ? 'text-[#4ade80]' : 'text-[#facc15]'}>
+                      {ev.result}
+                    </span>
+                    <span className="text-[#888888]">{examinerName}</span>
+                  </div>
+                )
+              })}
             </div>
           </div>
         </section>
@@ -206,15 +227,27 @@ export default function MedicalPsychology() {
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
                     <span className="text-xs text-[#4ade80]" style={{ fontFamily: MONO }}>[部长]</span>
-                    <span className="text-sm text-[#f0f0f0]">埃莉诺·肖 (Eleanor Shaw) 博士</span>
+                    <span className="text-sm text-[#f0f0f0]">
+                      {deptMinister
+                        ? `${deptMinister.name}${deptMinister.nameEn ? ` (${deptMinister.nameEn})` : ''}${deptMinister.title ? ` ${deptMinister.title}` : ''}`
+                        : '埃莉诺·肖 (Eleanor Shaw) 博士'}
+                    </span>
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="text-xs text-[#facc15]" style={{ fontFamily: MONO }}>[副部长]</span>
-                    <span className="text-sm text-[#f0f0f0]">戴维·卡特 (David Carter) 博士</span>
+                    <span className="text-sm text-[#f0f0f0]">
+                      {deptDeputy
+                        ? `${deptDeputy.name}${deptDeputy.nameEn ? ` (${deptDeputy.nameEn})` : ''}${deptDeputy.title ? ` ${deptDeputy.title}` : ''}`
+                        : '戴维·卡特 (David Carter) 博士'}
+                    </span>
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="text-xs text-[#4ade80]" style={{ fontFamily: MONO }}>[首席]</span>
-                    <span className="text-sm text-[#f0f0f0]">詹姆斯·帕克 (James Parker) 博士 - 心理治疗主管</span>
+                    <span className="text-sm text-[#f0f0f0]">
+                      {psychChief
+                        ? `${psychChief.name}${psychChief.nameEn ? ` (${psychChief.nameEn})` : ''}${psychChief.title ? ` ${psychChief.title}` : ''} - 心理治疗主管`
+                        : '詹姆斯·帕克 (James Parker) 博士 - 心理治疗主管'}
+                    </span>
                   </div>
                 </div>
               </div>
