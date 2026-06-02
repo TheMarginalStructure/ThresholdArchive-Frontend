@@ -41,7 +41,6 @@ export default function Archives() {
 
   // 从后端获取类别列表
   useEffect(() => {
-    const controller = new AbortController()
     api.archives.categories()
       .then(setCategories)
       .catch(() => {})
@@ -55,7 +54,9 @@ export default function Archives() {
     return matched ? matched.category : '全部'
   }, [urlCategory, categories])
 
+  // 获取档案列表（AbortController 防止竞态：旧请求后返回时不覆盖新数据）
   useEffect(() => {
+    const abort = new AbortController()
     setLoading(true)
     setError(null)
     const params: Record<string, string> = { limit: '1000', page: '1' }
@@ -67,11 +68,19 @@ export default function Archives() {
     }
     api.archives.list(params)
       .then((res) => {
+        if (abort.signal.aborted) return
         setArchives(res.data)
         setTotal(res.meta.total)
       })
-      .catch((err) => setError(err.message || '加载失败'))
-      .finally(() => setLoading(false))
+      .catch((err) => {
+        if (abort.signal.aborted) return
+        setError(err.message || '加载失败')
+      })
+      .finally(() => {
+        if (abort.signal.aborted) return
+        setLoading(false)
+      })
+    return () => abort.abort()
   }, [activeCategory, searchQuery])
 
   const filteredArchives = useMemo(() => {
