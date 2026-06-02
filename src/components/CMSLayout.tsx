@@ -1,4 +1,4 @@
-import { type ReactNode, useState } from 'react'
+import { type ReactNode, useState, useEffect } from 'react'
 import { Link, useLocation, useSearchParams } from 'react-router'
 import { MONO, BODY } from '../utils/fonts'
 
@@ -35,39 +35,56 @@ const NAV_ITEMS: NavItem[] = [
       label: c.label,
     })),
   },
+  { path: '/admin/personnel', label: '人事管理' },
   { path: '/admin/news', label: '新闻管理' },
   { path: '/admin/equipment', label: '装备管理' },
   { path: '/admin/reviews', label: '评价管理' },
   { path: '/admin/announcements', label: '系统公告' },
-  { path: '/admin/personnel', label: '人事管理' },
 ]
 
 export default function CMSLayout({ children }: CMSLayoutProps) {
   const location = useLocation()
   const [searchParams] = useSearchParams()
   const currentCategory = searchParams.get('category')
+  const [time, setTime] = useState(new Date())
 
-  // Archives submenu: expanded by default if on an archives page
   const [expandedArchives, setExpandedArchives] = useState(
     location.pathname.startsWith('/admin/archives')
   )
 
-  return (
-    <div className="fixed inset-0 flex bg-[#0a0a0a] text-[#f0f0f0]" style={{ fontFamily: BODY }}>
-      <aside className="w-56 flex-shrink-0 border-r border-white/[0.06] bg-[#0c0c0c] flex flex-col">
-        <Link to="/admin" className="flex items-center gap-3 px-5 py-5 border-b border-white/[0.06]">
-          <img src="/assets/favicon.png" alt="ThresholdArchive" className="w-7 h-7 rounded-sm" />
-          <div>
-            <div className="text-xs font-bold tracking-widest uppercase" style={{ fontFamily: MONO, color: '#f0f0f0' }}>
-              CMS
-            </div>
-            <div className="text-[10px] tracking-[0.2em] uppercase" style={{ fontFamily: MONO, color: '#555555' }}>
-              管理后台
-            </div>
-          </div>
-        </Link>
+  useEffect(() => {
+    const timer = setInterval(() => setTime(new Date()), 1000)
+    return () => clearInterval(timer)
+  }, [])
 
-        <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto custom-scrollbar">
+  const formattedTime = time.toISOString().replace('T', ' ').substring(0, 19)
+
+  return (
+    <div className="fixed inset-0 flex bg-[#080808] text-[#f0f0f0]" style={{ fontFamily: BODY }}>
+      {/* 终端扫描线装饰 */}
+      <div className="fixed inset-0 pointer-events-none z-50 opacity-[0.015]"
+        style={{
+          background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.03) 2px, rgba(255,255,255,0.03) 4px)',
+        }}
+      />
+
+      {/* 侧边栏 */}
+      <aside className="w-56 flex-shrink-0 border-r border-white/[0.04] bg-[#0a0a0a] flex flex-col">
+        {/* 终端头部 */}
+        <div className="px-4 py-3 border-b border-white/[0.04]">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-[#e60012] animate-pulse" />
+            <span className="text-[10px] tracking-[0.15em] uppercase" style={{ fontFamily: MONO, color: '#555' }}>
+              CMS TERMINAL
+            </span>
+          </div>
+          <div className="text-[9px] mt-1.5" style={{ fontFamily: MONO, color: '#444' }}>
+            {formattedTime} UTC
+          </div>
+        </div>
+
+        {/* 导航 */}
+        <nav className="flex-1 px-2 py-3 space-y-0.5 overflow-y-auto custom-scrollbar">
           {NAV_ITEMS.map((item) => {
             const isActive = item.path === '/admin'
               ? location.pathname === '/admin'
@@ -78,67 +95,57 @@ export default function CMSLayout({ children }: CMSLayoutProps) {
                 <div key={item.path}>
                   <button
                     onClick={() => setExpandedArchives(!expandedArchives)}
-                    className="flex items-center gap-3 w-full px-3 py-2.5 rounded text-xs transition-all duration-150"
+                    className="flex items-center gap-2 w-full px-3 py-2 rounded text-xs transition-all duration-150"
                     style={{
                       fontFamily: MONO,
-                      color: isActive ? '#f0f0f0' : '#666666',
-                      background: isActive ? 'rgba(230,0,18,0.08)' : 'transparent',
-                      borderLeft: isActive ? '2px solid #e60012' : '2px solid transparent',
-                      marginLeft: isActive ? '0' : '2px',
+                      color: isActive ? '#f0f0f0' : '#555',
+                      background: isActive ? 'rgba(212,163,115,0.08)' : 'transparent',
                     }}
                     onMouseEnter={(e) => {
                       if (!isActive) {
-                        e.currentTarget.style.color = '#aaaaaa'
+                        e.currentTarget.style.color = '#aaa'
                         e.currentTarget.style.background = 'rgba(255,255,255,0.02)'
                       }
                     }}
                     onMouseLeave={(e) => {
                       if (!isActive) {
-                        e.currentTarget.style.color = '#666666'
+                        e.currentTarget.style.color = '#555'
                         e.currentTarget.style.background = 'transparent'
                       }
                     }}
                   >
-                    <span className="text-xs opacity-60">{item.label.slice(0, 1)}</span>
+                    <span className="text-[10px] opacity-40" style={{ fontFamily: MONO }}>{'>'}</span>
                     <span className="flex-1 text-left">{item.label}</span>
-                    <svg
-                      className={`w-3 h-3 transition-transform duration-200 ${expandedArchives ? 'rotate-90' : ''}`}
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <path d="M9 18l6-6-6-6" />
-                    </svg>
+                    <span className="text-[10px] opacity-30">{expandedArchives ? '−' : '+'}</span>
                   </button>
                   {expandedArchives && (
-                    <div className="mt-0.5 space-y-0.5">
+                    <div className="mt-0.5 space-y-0.5 ml-3 border-l border-white/[0.03] pl-2">
                       {item.children.map((child) => {
                         const childActive = currentCategory === decodeURIComponent(child.path.split('category=')[1])
                         return (
                           <Link
                             key={child.path}
                             to={child.path}
-                            className="flex items-center gap-3 px-3 py-1.5 rounded text-xs transition-all duration-150"
+                            className="flex items-center gap-2 px-3 py-1.5 rounded text-xs transition-all duration-150"
                             style={{
                               fontFamily: MONO,
-                              color: childActive ? '#d4a373' : '#555555',
-                              background: childActive ? 'rgba(212,163,115,0.08)' : 'transparent',
-                              paddingLeft: '2.25rem',
+                              color: childActive ? '#d4a373' : '#444',
+                              background: childActive ? 'rgba(212,163,115,0.06)' : 'transparent',
                             }}
                             onMouseEnter={(e) => {
                               if (!childActive) {
-                                e.currentTarget.style.color = '#aaaaaa'
+                                e.currentTarget.style.color = '#888'
                                 e.currentTarget.style.background = 'rgba(255,255,255,0.02)'
                               }
                             }}
                             onMouseLeave={(e) => {
                               if (!childActive) {
-                                e.currentTarget.style.color = '#555555'
+                                e.currentTarget.style.color = '#444'
                                 e.currentTarget.style.background = 'transparent'
                               }
                             }}
                           >
+                            <span className="text-[9px] opacity-30">▸</span>
                             <span>{child.label}</span>
                           </Link>
                         )
@@ -153,48 +160,89 @@ export default function CMSLayout({ children }: CMSLayoutProps) {
               <Link
                 key={item.path}
                 to={item.path}
-                className="flex items-center gap-3 px-3 py-2.5 rounded text-xs transition-all duration-150"
+                className="flex items-center gap-2 px-3 py-2 rounded text-xs transition-all duration-150"
                 style={{
                   fontFamily: MONO,
-                  color: isActive ? '#f0f0f0' : '#666666',
-                  background: isActive ? 'rgba(230,0,18,0.08)' : 'transparent',
-                  borderLeft: isActive ? '2px solid #e60012' : '2px solid transparent',
-                  marginLeft: isActive ? '0' : '2px',
+                  color: isActive ? '#f0f0f0' : '#555',
+                  background: isActive ? 'rgba(212,163,115,0.08)' : 'transparent',
                 }}
                 onMouseEnter={(e) => {
                   if (!isActive) {
-                    e.currentTarget.style.color = '#aaaaaa'
+                    e.currentTarget.style.color = '#aaa'
                     e.currentTarget.style.background = 'rgba(255,255,255,0.02)'
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (!isActive) {
-                    e.currentTarget.style.color = '#666666'
+                    e.currentTarget.style.color = '#555'
                     e.currentTarget.style.background = 'transparent'
                   }
                 }}
               >
-                <span className="text-xs opacity-60">{item.label.slice(0, 1)}</span>
+                <span className="text-[10px] opacity-40" style={{ fontFamily: MONO }}>{'>'}</span>
                 <span>{item.label}</span>
+                {location.pathname.startsWith(item.path) && item.path !== '/admin' && (
+                  <span className="ml-auto text-[9px]" style={{ color: '#d4a373' }}>▸</span>
+                )}
               </Link>
             )
           })}
         </nav>
 
-        <div className="px-5 py-4 border-t border-white/[0.06]">
-          <Link
-            to="/"
-            target="_blank"
-            className="text-[10px] tracking-widest uppercase hover:text-[#d4a373] transition-colors"
-            style={{ fontFamily: MONO, color: '#555555' }}
-          >
-            返回前台
-          </Link>
+        {/* 底部状态栏 */}
+        <div className="border-t border-white/[0.04]">
+          <div className="px-4 py-2.5">
+            <Link
+              to="/"
+              target="_blank"
+              className="text-[10px] tracking-wider hover:text-[#d4a373] transition-colors flex items-center gap-2"
+              style={{ fontFamily: MONO, color: '#444' }}
+            >
+              <span className="text-[9px] opacity-40">◄</span>
+              返回前台
+            </Link>
+          </div>
+          <div className="px-4 py-2 border-t border-white/[0.03] flex items-center gap-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-[#4ade80] opacity-60" />
+            <span className="text-[9px]" style={{ fontFamily: MONO, color: '#444' }}>
+              SYSTEM ONLINE
+            </span>
+          </div>
         </div>
       </aside>
 
-      <main className="flex-1 min-w-0 p-6 overflow-y-auto custom-scrollbar" style={{ fontFamily: BODY }}>
-        {children}
+      {/* 主内容区 */}
+      <main className="flex-1 min-w-0 overflow-y-auto custom-scrollbar relative">
+        {/* 顶部状态条 */}
+        <div className="sticky top-0 z-10 backdrop-blur-sm border-b border-white/[0.03]">
+          <div className="flex items-center justify-between px-6 py-2">
+            <div className="flex items-center gap-3 text-[10px]" style={{ fontFamily: MONO, color: '#444' }}>
+              <span>TMS::CMS</span>
+              <span className="opacity-30">/</span>
+              <span className="text-[#666]">
+                {location.pathname === '/admin' ? '控制台' : location.pathname.replace('/admin/', '')}
+              </span>
+            </div>
+            <div className="flex items-center gap-3 text-[9px]" style={{ fontFamily: MONO, color: '#333' }}>
+              <span>UPTIME: 100%</span>
+              <span className="w-1 h-1 rounded-full bg-[#4ade80] opacity-30" />
+              <span>CONN: SECURE</span>
+            </div>
+          </div>
+        </div>
+
+        {/* 内容 */}
+        <div className="p-6" style={{ fontFamily: BODY }}>
+          {children}
+        </div>
+
+        {/* 底部装饰 */}
+        <div className="border-t border-white/[0.02] px-6 py-3 mt-8">
+          <div className="flex items-center justify-between text-[9px]" style={{ fontFamily: MONO, color: '#333' }}>
+            <span>THRESHOLD ARCHIVE MANAGEMENT SYSTEM v4.1</span>
+            <span>TERMINAL MODE</span>
+          </div>
+        </div>
       </main>
     </div>
   )
