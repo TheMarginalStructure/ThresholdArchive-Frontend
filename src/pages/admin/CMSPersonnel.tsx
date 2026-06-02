@@ -24,6 +24,7 @@ export default function CMSPersonnel() {
           <div>
             <h1 className="text-lg text-[#f0f0f0] font-bold">人事管理</h1>
             <p className="text-xs text-[#888888] mt-1">共 {personnel.length} 条记录</p>
+          </div>
           <Link
             to="/admin/personnel/new"
             className="px-3 py-1.5 text-xs border border-[#4ade80]/40 text-[#4ade80] hover:bg-[#4ade80]/10 transition-colors"
@@ -31,7 +32,6 @@ export default function CMSPersonnel() {
           >
             + 新增
           </Link>
-          </div>
         </div>
 
         {loading && (
