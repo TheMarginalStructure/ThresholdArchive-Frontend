@@ -35,7 +35,7 @@ export const THREAT_FILES: ThreatFile[] = [
         relation: '理论基础',
       },
       {
-        code: 'HR-300001',
+        code: 'HR-20001',
         type: '人事档案',
         title: '艾伦·凯个人档案',
         relation: '受害者背景',

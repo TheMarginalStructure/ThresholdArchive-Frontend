@@ -2,8 +2,8 @@
 
 export const PERSONNEL_FILES: PersonnelFile[] = [
   {
-    id: 'HR-400001',
-    code: 'HR-400001',
+    id: 'HR-40002',
+    code: 'HR-40002',
     title: '人员：戴维·卡特博士 | 履历材料',
     status: '归档',
     threatLevel: '不适用',
@@ -189,19 +189,19 @@ export const PERSONNEL_FILES: PersonnelFile[] = [
     ],
     appendices: [
       {
-        code: 'HR-400001-A01',
+        code: 'HR-40002-A01',
         content: '学历证书扫描件',
         type: 'PDF文档',
         location: '档案系统',
       },
       {
-        code: 'HR-400001-A02',
+        code: 'HR-40002-A02',
         content: '职业资格证书扫描件',
         type: 'PDF文档',
         location: '档案系统',
       },
       {
-        code: 'HR-400001-A03',
+        code: 'HR-40002-A03',
         content: 'L734-LND事件相关材料',
         type: '档案引用',
         location: '档案系统',

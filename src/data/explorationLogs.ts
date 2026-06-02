@@ -813,7 +813,7 @@ export const EXPLORATION_LOGS: ExplorationLog[] = [
         relation: '基础威胁信息',
       },
       {
-        code: 'HR-200001',
+        code: 'HR-20001',
         type: '人事档案',
         title: '守护者-德尔塔人员档案',
         relation: '牺牲队员信息',

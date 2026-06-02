@@ -68,7 +68,7 @@ export const PROTOCOL_MANUALS: ProtocolManual[] = [
       },
       {
         title: '人事档案（HR）',
-        content: '格式：HR-部门代码+工号（共6位数字，无额外连字符）\n\n• 部门代码：2位数字\n• 工号：4位数字，部门内唯一\n\n示例：\n• HR-100001：总指挥伊利亚·彼得连科\n• HR-300002：首席档案员安雅·夏尔马\n• HR-209001：代号"堡垒"（外勤部，工号9001）',
+        content: '格式：HR-部门代码+工号（共6位数字，无额外连字符）\n\n• 部门代码：2位数字\n• 工号：4位数字，部门内唯一\n\n示例：\n• HR-10001：总指挥伊利亚·彼得连科\n• HR-30002：首席档案员安雅·夏尔马\n• HR-20012：代号"堡垒"（外勤部，工号9001）',
       },
       {
         title: '事件/通信（EVT）',
@@ -84,7 +84,7 @@ export const PROTOCOL_MANUALS: ProtocolManual[] = [
       },
       {
         title: '新旧编码映射表',
-        content: '| 旧编码 | 新编码（v4.0） | 说明 |\n| TF-L734-LND | OBJ-L0734 | 囤积者回廊作为重要对象建档 |\n| TF-L234-LND | OBJ-L0234 | 明知山重要对象 |\n| TF-O881-COG | OBJ-O0881 | 万花筒殿重要对象 |\n| TF-E771-ENT | OBJ-E0771 | 悲鸣之云实体（重要） |\n| TF-O442-OBJ | OBJ-O0442-01 | 共鸣水晶，作为回音殿堂的第一个重要对象 |\n| TF-O2847-NEG | OBJ-O2847 | 否定之人 |\n| TF-L735-LND | OBJ-L0735 | 深邃之海重要对象 |\n| IR-V990-INC | EVT-P0990-INC | 事件报告 |\n| EL-Gamma-L234-COG | EXP-L0234 | 首次勘探 |\n| EL-Dreamweaver-O881-COG | EXP-O0881 | 首次勘探 |\n| EL-Guardian-E771-COG | EXP-E0771 | 首次勘探 |\n| EL-Gamma-L734-COG | EXP-L0734 | 首次勘探 |\n| EL-Beta-O442-SPC | EXP-O0442 | 首次勘探 |\n| EL-Gamma-L735-PHY | EXP-L0735 | 首次勘探 |\n| MHR-L734-PSY-DCarter | MED-L0734 | 医疗报告 |\n| MHR-E771-PSY | MED-E0771 | 医疗报告 |\n| MHR-V990-PSY | MED-P0990 | 医疗报告 |\n| HR-MED-DCarter-RES | HR-400001 | 戴维·卡特博士，医疗部（40），工号0001 |\n| EXP-O442-PHY | EXP-O0442 | 首次实验 |\n| TD-O881-COG | THY-O0881 | 理论文件 |\n| TD-L234-COG | THY-L0234 | 理论文件 |\n| COM-O2847-INT | EVT-O2847-COM | 通信记录 |\n| PRT-ARC-QRY-COD | PRT-0002 | 代码查询手册 |\n| PRT-LAB-SAF-SOP | PRT-0003 | 实验室安全操作规程 |\n| PRT-ARC-SOP-ARC | PRT-0004 | 档案管理规范 |\n| PRT-ARC-RUL-COD | PRT-0001 | 本文件（原编码规则） |\n| PRT-ARC-CLS-THD | PRT-0005 | 阈界分类标准 |',
+        content: '| 旧编码 | 新编码（v4.0） | 说明 |\n| TF-L734-LND | OBJ-L0734 | 囤积者回廊作为重要对象建档 |\n| TF-L234-LND | OBJ-L0234 | 明知山重要对象 |\n| TF-O881-COG | OBJ-O0881 | 万花筒殿重要对象 |\n| TF-E771-ENT | OBJ-E0771 | 悲鸣之云实体（重要） |\n| TF-O442-OBJ | OBJ-O0442-01 | 共鸣水晶，作为回音殿堂的第一个重要对象 |\n| TF-O2847-NEG | OBJ-O2847 | 否定之人 |\n| TF-L735-LND | OBJ-L0735 | 深邃之海重要对象 |\n| IR-V990-INC | EVT-P0990-INC | 事件报告 |\n| EL-Gamma-L234-COG | EXP-L0234 | 首次勘探 |\n| EL-Dreamweaver-O881-COG | EXP-O0881 | 首次勘探 |\n| EL-Guardian-E771-COG | EXP-E0771 | 首次勘探 |\n| EL-Gamma-L734-COG | EXP-L0734 | 首次勘探 |\n| EL-Beta-O442-SPC | EXP-O0442 | 首次勘探 |\n| EL-Gamma-L735-PHY | EXP-L0735 | 首次勘探 |\n| MHR-L734-PSY-DCarter | MED-L0734 | 医疗报告 |\n| MHR-E771-PSY | MED-E0771 | 医疗报告 |\n| MHR-V990-PSY | MED-P0990 | 医疗报告 |\n| HR-MED-DCarter-RES | HR-40002 | 戴维·卡特博士，医疗部（40），工号0001 |\n| EXP-O442-PHY | EXP-O0442 | 首次实验 |\n| TD-O881-COG | THY-O0881 | 理论文件 |\n| TD-L234-COG | THY-L0234 | 理论文件 |\n| COM-O2847-INT | EVT-O2847-COM | 通信记录 |\n| PRT-ARC-QRY-COD | PRT-0002 | 代码查询手册 |\n| PRT-LAB-SAF-SOP | PRT-0003 | 实验室安全操作规程 |\n| PRT-ARC-SOP-ARC | PRT-0004 | 档案管理规范 |\n| PRT-ARC-RUL-COD | PRT-0001 | 本文件（原编码规则） |\n| PRT-ARC-CLS-THD | PRT-0005 | 阈界分类标准 |',
       },
       {
         title: '其他优化建议',
