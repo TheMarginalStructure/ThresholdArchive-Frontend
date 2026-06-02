@@ -43,9 +43,10 @@ export default function CMSPersonnel() {
             <table className="w-full text-xs">
               <thead>
                 <tr className="border-b border-white/10 text-[#888888]" style={{ fontFamily: MONO }}>
-                  <th className="text-left p-3 font-normal">编码</th>
+                  <th className="text-left p-3 font-normal">人员编码</th>
                   <th className="text-left p-3 font-normal">姓名</th>
                   <th className="text-left p-3 font-normal">部门</th>
+                  <th className="text-left p-3 font-normal">部门编码</th>
                   <th className="text-left p-3 font-normal">职位</th>
                   <th className="text-left p-3 font-normal">状态</th>
                   <th className="text-left p-3 font-normal">权限等级</th>
@@ -60,6 +61,7 @@ export default function CMSPersonnel() {
                       {p.name}{p.nameEn ? ` (${p.nameEn})` : ''}
                     </td>
                     <td className="p-3 text-[#888888]">{p.department?.name || '-'}</td>
+                    <td className="p-3 text-[#60a5fa]" style={{ fontFamily: MONO }}>{p.department?.code || '-'}</td>
                     <td className="p-3 text-[#888888]">{p.position || '-'}</td>
                     <td className="p-3">
                       <span className={`px-2 py-0.5 text-[10px] ${
