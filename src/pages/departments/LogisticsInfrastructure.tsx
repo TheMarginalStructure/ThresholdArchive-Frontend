@@ -53,8 +53,8 @@ export default function LogisticsInfrastructure() {
     { label: '本月采购', value: 127, unit: '项' },
   ]
 
-  const deptMinister = personnel.find(p => p.position?.includes('部长'))
-  const deptDeputy = personnel.find(p => p.position?.includes('副部长'))
+  const deptMinister = personnel.find(p => p.name.includes('彼得·安德森'))
+  const deptDeputy = personnel.find(p => p.name.includes('奥尔加'))
   const lockChief = personnel.find(p => p.codename === '锁匠' || p.name.includes('彼得罗夫'))
 
   return (

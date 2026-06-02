@@ -52,8 +52,8 @@ export default function SecurityProtection() {
     { label: '装备库存', value: EQUIPMENT_INVENTORY.reduce((s, e) => s + e.count, 0), unit: '件' },
   ]
 
-  const deptMinister = personnel.find(p => p.position?.includes('部长'))
-  const deptDeputy = personnel.find(p => p.position?.includes('副部长'))
+  const deptMinister = personnel.find(p => p.name.includes('维克多·科瓦列夫'))
+  const deptDeputy = personnel.find(p => p.name.includes('莎拉'))
   const chiefResponder = personnel.find(p => p.name.includes('马库斯'))
 
   return (

@@ -49,8 +49,8 @@ export default function MedicalPsychology() {
     { label: '本月救治', value: 43, unit: '人次' },
   ]
 
-  const deptMinister = personnel.find(p => p.position?.includes('部长'))
-  const deptDeputy = personnel.find(p => p.position?.includes('副部长') || p.name.includes('戴维·卡特'))
+  const deptMinister = personnel.find(p => p.name.includes('埃莉诺'))
+  const deptDeputy = personnel.find(p => p.name.includes('戴维·卡特'))
   const psychChief = personnel.find(p => p.name.includes('詹姆斯'))
 
   return (
