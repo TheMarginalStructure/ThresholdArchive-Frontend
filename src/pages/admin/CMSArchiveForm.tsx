@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import MDEditor from '@uiw/react-md-editor'
+import ThresholdArchiveDetails from './ThresholdArchiveDetails'
 import CMSLayout from '../../components/CMSLayout'
 import { api } from '../../lib/api'
 
@@ -38,6 +39,7 @@ export default function CMSArchiveForm() {
   const [uploading, setUploading] = useState(false)
   const [templates, setTemplates] = useState<any[]>([])
   const [showCreateDialog, setShowCreateDialog] = useState(!isEdit)
+  const [detailsObj, setDetailsObj] = useState<Record<string, unknown>>(() => { try { return form.details ? JSON.parse(form.details) : {} } catch { return {} } })
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleImportFile = async (file: File) => {
