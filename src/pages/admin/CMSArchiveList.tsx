@@ -8,8 +8,8 @@ export default function CMSArchiveList() {
   const [searchParams, setSearchParams] = useSearchParams()
   const [archives, setArchives] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
-  const [filter, setFilter] = useState({
   const [deleteTarget, setDeleteTarget] = useState<number | null>(null)
+  const [filter, setFilter] = useState({
     search: '',
     category: searchParams.get('category') || '',
     status: '',
