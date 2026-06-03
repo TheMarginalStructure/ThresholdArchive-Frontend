@@ -522,14 +522,24 @@ export default function CMSArchiveForm() {
                 </select>
               </div>
             )}
-            <div className="border border-white/10 rounded overflow-hidden" data-color-mode="dark">
-              <MDEditor
-                value={form.useCustomTemplate ? form.customTemplate : form.details}
-                onChange={(val) => handleChange(form.useCustomTemplate ? 'customTemplate' : 'details', val || '')}
-                preview="edit"
-                height={400}
+            {form.category === '阈界档案' && !form.useCustomTemplate ? (
+              <ThresholdArchiveDetails
+                details={detailsObj}
+                onChange={(obj) => {
+                  setDetailsObj(obj)
+                  handleChange('details', JSON.stringify(obj))
+                }}
               />
-            </div>
+            ) : (
+              <div className="border border-white/10 rounded overflow-hidden" data-color-mode="dark">
+                <MDEditor
+                  value={form.useCustomTemplate ? form.customTemplate : form.details}
+                  onChange={(val) => handleChange(form.useCustomTemplate ? 'customTemplate' : 'details', val || '')}
+                  preview="edit"
+                  height={400}
+                />
+              </div>
+            )}
           </div>
 
           <div className="border border-white/10 rounded p-4 space-y-4">
