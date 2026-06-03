@@ -751,7 +751,7 @@ function ThreatFileContent({ details }: { details: Record<string, unknown> }) {
                       style={{ height: `${height}px`, background: `hsl(${35 + i * 15}, 50%, ${35 + i * 5}%)` }}
                       title={String(phase.name || '')}
                     />
-                    <div className="text-[9px] text-[#666] truncate w-full text-center">{String(phase.name || '').substring(0, 3)}</div>
+                    <div className="text-[9px] text-[#666] truncate w-full text-center">{String(phase.name || '')}</div>
                   </div>
                 )
               })}
