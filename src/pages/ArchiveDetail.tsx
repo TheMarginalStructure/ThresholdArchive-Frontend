@@ -2232,7 +2232,27 @@ function ProtocolManualContent({ details }: { details: Record<string, unknown> }
                     ))}
                   </ul>
                 ) : (
-                  <div className="text-xs text-[#888888] leading-relaxed whitespace-pre-wrap">{String(section.content || '')}</div>
+                  <div className="text-xs text-[#c0c0c0] leading-relaxed prose prose-sm max-w-none prose-invert"
+                    style={{
+                      '--tw-prose-body': '#c0c0c0',
+                      '--tw-prose-headings': '#f0f0f0',
+                      '--tw-prose-links': '#d4a373',
+                      '--tw-prose-bold': '#f0f0f0',
+                      '--tw-prose-counters': '#888888',
+                      '--tw-prose-bullets': '#888888',
+                      '--tw-prose-hr': 'rgba(255,255,255,0.1)',
+                      '--tw-prose-quotes': '#888888',
+                      '--tw-prose-code': '#d4a373',
+                      '--tw-prose-pre-code': '#f0f0f0',
+                      '--tw-prose-pre-bg': 'rgba(0,0,0,0.3)',
+                      '--tw-prose-th-borders': 'rgba(255,255,255,0.15)',
+                      '--tw-prose-td-borders': 'rgba(255,255,255,0.06)',
+                    } as React.CSSProperties}
+                  >
+                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
+                      {String(section.content || '')}
+                    </ReactMarkdown>
+                  </div>
                 )}
               </div>
             ))}
