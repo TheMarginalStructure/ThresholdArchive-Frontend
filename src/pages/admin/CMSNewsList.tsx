@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router'
+import ConfirmModal from '../../components/ConfirmModal'
 import CMSLayout from '../../components/CMSLayout'
 import { api, API_BASE } from '../../lib/api'
 
@@ -7,6 +8,7 @@ export default function CMSNewsList() {
   const [news, setNews] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('')
+  const [deleteTarget, setDeleteTarget] = useState<number | null>(null)
 
   const load = async () => {
     setLoading(true)
@@ -19,11 +21,11 @@ export default function CMSNewsList() {
 
   useEffect(() => { load() }, [])
 
-  const handleDelete = async (id: number) => {
-    if (!confirm('确定删除此新闻？')) return
+  const handleDelete = async () => {
+    if (!deleteTarget) return
     try {
-      await fetch(`${API_BASE}/cms/news/${id}`, { method: 'DELETE' })
-      setNews(prev => prev.filter(n => n.id !== id))
+      await fetch(`${API_BASE}/cms/news/${deleteTarget}`, { method: 'DELETE' })
+      setNews(prev => prev.filter(n => n.id !== deleteTarget))
     } catch (e) { console.error(e) }
   }
 
@@ -87,7 +89,7 @@ export default function CMSNewsList() {
                   <td className="px-4 py-3 text-[#888888]">{new Date(item.publishedAt).toLocaleDateString('zh-CN')}</td>
                   <td className="px-4 py-3 text-right">
                     <Link to={`/admin/news/${item.id}`} className="text-[#d4a373] hover:underline mr-3">编辑</Link>
-                    <button onClick={() => handleDelete(item.id)} className="text-[#e60012] hover:underline">删除</button>
+                    <button onClick={() => setDeleteTarget(item.id)} className="text-[#e60012] hover:underline">删除</button>
                   </td>
                 </tr>
               ))
@@ -95,6 +97,14 @@ export default function CMSNewsList() {
           </tbody>
         </table>
       </div>
+    
+      <ConfirmModal
+        open={deleteTarget !== null}
+        message="确定删除此新闻？"
+        danger
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </CMSLayout>
   )
 }

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router'
+import ConfirmModal from '../../components/ConfirmModal'
 import CMSLayout from '../../components/CMSLayout'
 import { api, API_BASE } from '../../lib/api'
 
@@ -23,6 +24,7 @@ export default function CMSEquipmentList() {
   const [search, setSearch] = useState('')
   const [filterCategory, setFilterCategory] = useState('全部')
   const [filterStatus, setFilterStatus] = useState('')
+  const [deleteTarget, setDeleteTarget] = useState<number | null>(null)
 
   const load = async () => {
     setLoading(true)
@@ -38,11 +40,11 @@ export default function CMSEquipmentList() {
 
   useEffect(() => { load() }, [filterCategory, filterStatus])
 
-  const handleDelete = async (id: number) => {
-    if (!confirm('确定删除此装备？')) return
+  const handleDelete = async () => {
+    if (!deleteTarget) return
     try {
-      await fetch(`${API_BASE}/cms/equipment/${id}`, { method: 'DELETE' })
-      setItems(prev => prev.filter(item => item.id !== id))
+      await fetch(`${API_BASE}/cms/equipment/${deleteTarget}`, { method: 'DELETE' })
+      setItems(prev => prev.filter(item => item.id !== deleteTarget))
     } catch (e) { console.error(e) }
   }
 
@@ -117,7 +119,7 @@ export default function CMSEquipmentList() {
                   <td className="px-4 py-3 text-right font-mono text-[#f0f0f0]">{item.stock}</td>
                   <td className="px-4 py-3 text-right">
                     <Link to={`/admin/equipment/${item.id}`} className="text-[#d4a373] hover:underline mr-3">编辑</Link>
-                    <button onClick={() => handleDelete(item.id)} className="text-[#e60012] hover:underline">删除</button>
+                    <button onClick={() => setDeleteTarget(item.id)} className="text-[#e60012] hover:underline">删除</button>
                   </td>
                 </tr>
               ))
@@ -125,6 +127,14 @@ export default function CMSEquipmentList() {
           </tbody>
         </table>
       </div>
+    
+      <ConfirmModal
+        open={deleteTarget !== null}
+        message="确定删除此装备？"
+        danger
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </CMSLayout>
   )
 }

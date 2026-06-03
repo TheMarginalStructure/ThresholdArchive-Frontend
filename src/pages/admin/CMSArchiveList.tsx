@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, useSearchParams } from 'react-router'
+import ConfirmModal from '../../components/ConfirmModal'
 import CMSLayout from '../../components/CMSLayout'
 import { api, API_BASE } from '../../lib/api'
 
@@ -8,6 +9,7 @@ export default function CMSArchiveList() {
   const [archives, setArchives] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState({
+  const [deleteTarget, setDeleteTarget] = useState<number | null>(null)
     search: '',
     category: searchParams.get('category') || '',
     status: '',
@@ -36,11 +38,11 @@ export default function CMSArchiveList() {
 
   useEffect(() => { load() }, [])
 
-  const handleDelete = async (id: number) => {
-    if (!confirm('确定删除此档案？')) return
+  const handleDelete = async () => {
+    if (!deleteTarget) return
     try {
-      await fetch(`${API_BASE}/cms/archives/${id}`, { method: 'DELETE' })
-      setArchives(prev => prev.filter(a => a.id !== id))
+      await fetch(`${API_BASE}/cms/archives/${deleteTarget}`, { method: 'DELETE' })
+      setArchives(prev => prev.filter(a => a.id !== deleteTarget))
     } catch (e) { console.error(e) }
   }
 
@@ -168,7 +170,7 @@ export default function CMSArchiveList() {
                   <td className="px-4 py-3 text-right whitespace-nowrap">
                     <a href={`/archive/${archive.id}`} target="_blank" rel="noopener noreferrer" className="text-[#888888] hover:text-[#d4a373] mr-3">预览</a>
                     <Link to={`/admin/archives/${archive.id}`} className="text-[#d4a373] hover:underline mr-3">编辑</Link>
-                    <button onClick={() => handleDelete(archive.id)} className="text-[#e60012] hover:underline">删除</button>
+                    <button onClick={() => setDeleteTarget(archive.id)} className="text-[#e60012] hover:underline">删除</button>
                   </td>
                 </tr>
               ))
@@ -176,6 +178,14 @@ export default function CMSArchiveList() {
           </tbody>
         </table>
       </div>
+    
+      <ConfirmModal
+        open={deleteTarget !== null}
+        message="确定删除此档案？"
+        danger
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </CMSLayout>
   )
 }

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router'
+import ConfirmModal from '../../components/ConfirmModal'
 import CMSLayout from '../../components/CMSLayout'
 import { api, API_BASE } from '../../lib/api'
 
@@ -14,6 +15,7 @@ const TYPE_COLORS: Record<string, string> = {
 export default function CMSAnnouncementList() {
   const [announcements, setAnnouncements] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [deleteTarget, setDeleteTarget] = useState<number | null>(null)
 
   const load = async () => {
     setLoading(true)
@@ -26,11 +28,11 @@ export default function CMSAnnouncementList() {
 
   useEffect(() => { load() }, [])
 
-  const handleDelete = async (id: number) => {
-    if (!confirm('确定删除此公告？')) return
+  const handleDelete = async () => {
+    if (!deleteTarget) return
     try {
-      await fetch(`${API_BASE}/cms/announcements/${id}`, { method: 'DELETE' })
-      setAnnouncements(prev => prev.filter(a => a.id !== id))
+      await fetch(`${API_BASE}/cms/announcements/${deleteTarget}`, { method: 'DELETE' })
+      setAnnouncements(prev => prev.filter(a => a.id !== deleteTarget))
     } catch (e) { console.error(e) }
   }
 
@@ -77,7 +79,7 @@ export default function CMSAnnouncementList() {
                   <td className="px-4 py-3 text-[#888888] text-[11px]">{new Date(announcement.createdAt).toLocaleDateString('zh-CN')}</td>
                   <td className="px-4 py-3 text-right">
                     <Link to={`/admin/announcements/${announcement.id}`} className="text-[#d4a373] hover:underline mr-3">编辑</Link>
-                    <button onClick={() => handleDelete(announcement.id)} className="text-[#e60012] hover:underline">删除</button>
+                    <button onClick={() => setDeleteTarget(announcement.id)} className="text-[#e60012] hover:underline">删除</button>
                   </td>
                 </tr>
               ))
@@ -85,6 +87,14 @@ export default function CMSAnnouncementList() {
           </tbody>
         </table>
       </div>
+    
+      <ConfirmModal
+        open={deleteTarget !== null}
+        message="确定删除此公告？"
+        danger
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </CMSLayout>
   )
 }

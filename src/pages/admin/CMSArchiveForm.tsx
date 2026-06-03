@@ -117,7 +117,8 @@ export default function CMSArchiveForm() {
       setShowCreateDialog(false)
     } catch (e) {
       console.error('导入失败:', e)
-      alert('导入失败: ' + (e as Error).message)
+      // 导入错误通过 console 记录
+          console.error(e)
     }
   }
 

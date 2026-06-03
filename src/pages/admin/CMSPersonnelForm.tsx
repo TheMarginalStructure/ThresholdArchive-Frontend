@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router'
+import ConfirmModal from '../../components/ConfirmModal'
 import CMSLayout from '../../components/CMSLayout'
 import { api, type ApiDepartment } from '../../lib/api'
 import { MONO } from '../../utils/fonts'
@@ -91,6 +92,8 @@ export default function CMSPersonnelForm() {
     setSaving(false)
   }
 
+  const [showDelete, setShowDelete] = useState(false)
+
   const handleDelete = async () => {
     if (!isEdit) return
     if (!confirm('确认删除此人？')) return
@@ -108,7 +111,16 @@ export default function CMSPersonnelForm() {
         <div className="p-6 text-center py-12 text-xs text-[#888888]" style={{ fontFamily: MONO }}>
           加载中...
         </div>
-      </CMSLayout>
+      
+      <ConfirmModal
+        open={showDelete}
+        message="确认删除此人？此操作不可撤销。"
+        danger
+        confirmLabel="删除"
+        onConfirm={handleDelete}
+        onCancel={() => setShowDelete(false)}
+      />
+    </CMSLayout>
     )
   }
 
@@ -122,7 +134,7 @@ export default function CMSPersonnelForm() {
           <div className="flex items-center gap-3">
             {isEdit && (
               <button
-                onClick={handleDelete}
+                onClick={() => setShowDelete(true)}
                 className="px-3 py-1.5 text-xs border border-[#e60012]/40 text-[#e60012] hover:bg-[#e60012]/10 transition-colors"
                 style={{ fontFamily: MONO }}
               >
