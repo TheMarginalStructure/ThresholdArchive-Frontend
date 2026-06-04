@@ -13,6 +13,7 @@ import Personnel from './pages/Personnel'
 import News from './pages/News'
 import About from './pages/About'
 import Contact from './pages/Contact'
+import ThresholdGallery from './pages/ThresholdGallery'
 import CustomScrollbar from './components/CustomScrollbar'
 import { MONO } from './utils/fonts'
 
@@ -114,6 +115,7 @@ export default function App() {
         {/* 前台页面 - 使用 FrontendLayout */}
         <Route element={<FrontendLayout />}>
           <Route path="/" element={<Home />} />
+          <Route path="/threshold-sigils" element={<ThresholdGallery />} />
           <Route path="/archives" element={<Archives />} />
           <Route path="/archives/:category" element={<Archives />} />
           <Route path="/archive/:id" element={<Suspense fallback={<PageSkeleton />}><ArchiveDetail /></Suspense>} />

@@ -7,6 +7,7 @@ import { MONO, BODY } from '../utils/fonts'
 const NAV_ITEMS = [
   { label: '首页', to: '/' },
   { label: '档案库', to: '/archives', hasDropdown: true },
+  { label: '阈界徽记', to: '/threshold-sigils' },
   { label: '事件通报', to: '/incidents' },
   { label: '任务中心', to: '/operations' },
   { label: '物资管理', to: '/equipment' },

@@ -32,6 +32,7 @@ export interface ApiArchive {
   sourceText: string | null
   attachmentText: string | null
   videoPath: string | null
+  logoSvg: string | null
   useCustomTemplate: boolean
   customTemplate: string | null
   createdAt: string

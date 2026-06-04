@@ -32,6 +32,7 @@ export default function CMSArchiveForm() {
     sourceDepartmentId: '', responsibleDepartmentId: '', leadPersonId: '',
     signatures: [] as SignatureEntry[],
     customTemplate: '', useCustomTemplate: false,
+    logoSvg: '',
   })
   const [imagePath, setImagePath] = useState('')
   const [videoPath, setVideoPath] = useState('')
@@ -116,6 +117,7 @@ export default function CMSArchiveForm() {
       })
       if (data.image) setImagePath(data.image)
       if (data.video) setVideoPath(data.video)
+      if (data.logoSvg) setForm(prev => ({ ...prev, logoSvg: data.logoSvg }))
       setShowCreateDialog(false)
     } catch (e) {
       console.error('导入失败:', e)
@@ -180,6 +182,7 @@ export default function CMSArchiveForm() {
           })
           setImagePath(data.imagePath || '')
           setVideoPath(data.videoPath || '')
+          setForm(prev => ({ ...prev, logoSvg: data.logoSvg || '' }))
         }
       } catch (e) { console.error(e) }
       setLoading(false)
@@ -661,6 +664,72 @@ export default function CMSArchiveForm() {
                     </label>
                   </div>
                 )}
+              </div>
+            </div>
+
+            {/* 阈界徽记编辑 */}
+            <div className="border border-white/10 rounded p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <h2 className="text-sm text-[#d4a373]">阈界徽记 (SVG)</h2>
+                <span className="text-[10px] text-[#666666] tracking-wider" style={{ fontFamily: 'monospace' }}>
+                  TMS 专属徽记
+                </span>
+              </div>
+              <p className="text-xs text-[#666]">直接粘贴 SVG 代码以自定义该阈界的徽记。修改后画廊页面将自动更新。</p>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {/* SVG 编辑区 */}
+                <div>
+                  <label className="text-xs text-[#888888] block mb-1">SVG 源码</label>
+                  <textarea
+                    value={form.logoSvg}
+                    onChange={e => handleChange('logoSvg', e.target.value)}
+                    rows={10}
+                    placeholder="在此粘贴 SVG 代码..."
+                    className="w-full bg-[#0a0a0a] border border-white/10 rounded px-3 py-2 text-xs font-mono text-[#cccccc] focus:border-[#d4a373] focus:outline-none resize-none"
+                    spellCheck={false}
+                  />
+                  <div className="flex gap-2 mt-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const svg = form.logoSvg
+                        if (svg) navigator.clipboard.writeText(svg)
+                      }}
+                      className="text-xs text-[#888888] border border-white/10 rounded px-2 py-1 hover:text-[#d4a373] transition-colors"
+                    >
+                      复制代码
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleChange('logoSvg', '')}
+                      className="text-xs text-[#e60012] border border-[#e60012]/40 rounded px-2 py-1 hover:bg-[#e60012]/10 transition-colors"
+                    >
+                      清空
+                    </button>
+                  </div>
+                </div>
+                {/* SVG 预览区 */}
+                <div>
+                  <label className="text-xs text-[#888888] block mb-1">实时预览</label>
+                  <div className="aspect-square rounded-lg bg-[#0d0d0d] border border-white/5 flex items-center justify-center p-6 overflow-hidden">
+                    {form.logoSvg ? (
+                      <div
+                        className="w-full h-full flex items-center justify-center"
+                        dangerouslySetInnerHTML={{ __html: form.logoSvg }}
+                      />
+                    ) : (
+                      <div className="text-center">
+                        <svg className="w-10 h-10 mx-auto mb-2 text-[#444]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                          <rect x="3" y="3" width="18" height="18" rx="2" />
+                          <circle cx="8.5" cy="8.5" r="1.5" />
+                          <path d="M21 15l-5-5L5 21" />
+                        </svg>
+                        <p className="text-[10px] text-[#555]">暂无徽记</p>
+                        <p className="text-[10px] text-[#444]">在左侧粘贴 SVG 代码即可预览</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
 
