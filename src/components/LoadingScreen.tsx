@@ -2,15 +2,15 @@ import { useEffect, useRef, useState } from 'react'
 import { MONO } from '../utils/fonts'
 
 const BOOT_LINES = [
-  { text: 'SYS::INIT', delay: 25 },
-  { text: 'SYS::LOADING secure_channel... OK', delay: 35 },
-  { text: 'SYS::LOADING threshold_db... OK', delay: 45 },
-  { text: 'SYS::ESTABLISHING encrypted_link... OK', delay: 50 },
-  { text: 'SYS::VERIFYING credentials... OK', delay: 40 },
-  { text: 'SYS::DECRYPTING archive_index... OK', delay: 60 },
-  { text: 'SYS::SYNCING anomaly_db... OK', delay: 35 },
-  { text: 'SYS::INITIALIZING monitor_daemon... OK', delay: 40 },
-  { text: 'SYS::READY.', delay: 25 },
+  { text: 'SYS::INIT', delay: 18 },
+  { text: 'SYS::LOADING secure_channel... OK', delay: 25 },
+  { text: 'SYS::LOADING threshold_db... OK', delay: 32 },
+  { text: 'SYS::ESTABLISHING encrypted_link... OK', delay: 35 },
+  { text: 'SYS::VERIFYING credentials... OK', delay: 28 },
+  { text: 'SYS::DECRYPTING archive_index... OK', delay: 42 },
+  { text: 'SYS::SYNCING anomaly_db... OK', delay: 25 },
+  { text: 'SYS::INITIALIZING monitor_daemon... OK', delay: 28 },
+  { text: 'SYS::READY.', delay: 18 },
   { text: '', delay: 0, isFinal: true },
 ]
 
@@ -39,10 +39,10 @@ export default function LoadingScreen({ onProgress, onComplete }: { onProgress?:
           setTimeout(() => {
             if (containerRef.current) {
               containerRef.current.style.transform = 'translateY(-100%)'
-              containerRef.current.style.transition = 'transform 0.35s cubic-bezier(0.76, 0, 0.24, 1)'
+              containerRef.current.style.transition = 'transform 0.2s cubic-bezier(0.76, 0, 0.24, 1)'
             }
-            setTimeout(onComplete, 300)
-          }, 200)
+            setTimeout(onComplete, 60)
+          }, 100)
           return
         }
 
