@@ -239,7 +239,7 @@ export default function CMSArchiveForm() {
       const url = isEdit ? `${API_BASE}/cms/archives/${id}` : `${API_BASE}/cms/archives`
       const method = isEdit ? 'PUT' : 'POST'
       const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
-      if (res.ok) navigate('/admin/archives')
+      if (res.ok) navigate(-1)
     } catch (e) { console.error(e) }
     setSaving(false)
   }
@@ -675,11 +675,55 @@ export default function CMSArchiveForm() {
                   TMS 专属徽记
                 </span>
               </div>
-              <p className="text-xs text-[#666]">直接粘贴 SVG 代码以自定义该阈界的徽记。修改后画廊页面将自动更新。</p>
+              <p className="text-xs text-[#666]">直接粘贴 SVG 代码，或将 .svg 文件拖入下方区域以上传。修改后画廊页面将自动更新。</p>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {/* SVG 编辑区 */}
                 <div>
                   <label className="text-xs text-[#888888] block mb-1">SVG 源码</label>
+                  {/* SVG 文件拖拽上传区 */}
+                  <div
+                    className="relative mb-2 border-2 border-dashed border-white/10 rounded-lg p-3 flex flex-col items-center justify-center gap-1.5 transition-colors cursor-pointer hover:border-[#d4a373]/40 hover:bg-[#d4a373]/5"
+                    onDragOver={e => { e.preventDefault(); (e.currentTarget as HTMLElement).style.borderColor = 'rgba(212,163,115,0.6)' }}
+                    onDragLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = '' }}
+                    onDrop={e => {
+                      e.preventDefault()
+                      ;(e.currentTarget as HTMLElement).style.borderColor = ''
+                      const file = e.dataTransfer.files[0]
+                      if (file && (file.name.endsWith('.svg') || file.type === 'image/svg+xml')) {
+                        const reader = new FileReader()
+                        reader.onload = (ev) => {
+                          const text = ev.target?.result as string
+                          if (text) handleChange('logoSvg', text)
+                        }
+                        reader.readAsText(file)
+                      }
+                    }}
+                    onClick={() => document.getElementById('svg-file-input')?.click()}
+                  >
+                    <svg className="w-5 h-5 text-[#666]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="17 8 12 3 7 8" />
+                      <line x1="12" y1="3" x2="12" y2="15" />
+                    </svg>
+                    <span className="text-[10px] text-[#666]">拖入 .svg 文件或点击选择</span>
+                    <input
+                      id="svg-file-input"
+                      type="file"
+                      accept=".svg,image/svg+xml"
+                      className="hidden"
+                      onChange={e => {
+                        const file = e.target.files?.[0]
+                        if (!file) return
+                        const reader = new FileReader()
+                        reader.onload = (ev) => {
+                          const text = ev.target?.result as string
+                          if (text) handleChange('logoSvg', text)
+                        }
+                        reader.readAsText(file)
+                        e.target.value = ''
+                      }}
+                    />
+                  </div>
                   <textarea
                     value={form.logoSvg}
                     onChange={e => handleChange('logoSvg', e.target.value)}

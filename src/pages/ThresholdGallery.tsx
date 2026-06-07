@@ -61,9 +61,8 @@ export default function ThresholdGallery() {
           className="text-xs text-[#888888] leading-relaxed max-w-2xl"
           style={{ fontFamily: BODY }}
         >
-          以下为归档于边际结构的所有已知阈界（TMS）档案之专属徽记。
-          每一枚徽记由该阈界的编码、威胁等级与本质特征所决定——其几何构型与色彩光谱
-          均非随机，而是异常信息在符号系统中的映射投影。
+          以下为归档于边际结构的所有已知阈界（TMS）档案之专属徽记。<br />
+          每一枚徽记由该阈界的编码、威胁等级与本质特征所决定——其几何构型与色彩光谱均非随机，而是异常信息在符号系统中的映射投影。
         </p>
       </div>
 
@@ -110,7 +109,7 @@ export default function ThresholdGallery() {
                 data-cursor-hover
               >
                 {/* SVG 容器 — 1:1 正方形 */}
-                <div className="relative aspect-square rounded-lg overflow-hidden bg-[#0d0d0d] border border-white/5 transition-all duration-500 group-hover:border-[#d4a373]/40 group-hover:shadow-[0_0_30px_rgba(212,163,115,0.15)]">
+                <div className="relative aspect-square rounded-lg overflow-hidden bg-white border border-white/5 transition-all duration-500 group-hover:border-[#d4a373]/40 group-hover:shadow-[0_0_30px_rgba(212,163,115,0.15)]">
                   {/* 内联 SVG */}
                   <div
                     className="w-full h-full flex items-center justify-center p-4 transition-transform duration-500 group-hover:scale-110"
@@ -119,11 +118,10 @@ export default function ThresholdGallery() {
 
                   {/* 悬浮遮罩信息 */}
                   <div
-                    className={`absolute inset-0 flex flex-col items-center justify-center gap-2 transition-all duration-400 ${
-                      hoveredId === archive.id
+                    className={`absolute inset-0 flex flex-col items-center justify-center gap-2 transition-all duration-400 ${hoveredId === archive.id
                         ? 'opacity-100 bg-black/70'
                         : 'opacity-0 pointer-events-none'
-                    }`}
+                      }`}
                   >
                     <span
                       className="text-xs text-[#d4a373] tracking-wider"
